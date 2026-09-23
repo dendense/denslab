@@ -1,0 +1,140 @@
+@import "tailwindcss";
+
+/* Theme is toggled by the `data-theme` attribute on <html>, so the toggle can
+   override the OS preference and `dark:` utilities follow the same source. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root,
+[data-theme="light"] {
+  --canvas: #fffdf8;
+  --accent: #ffde59;
+  /* Text/icon color, inverted in dark mode. */
+  --ink: #000000;
+  /* Text on top of `--accent`. Always black: the accent is light in both modes. */
+  --on-accent: #000000;
+  /* Structural color for borders and hard shadows, stays black in both modes. */
+  --edge: #000000;
+  --foreground: #09090b;
+}
+
+[data-theme="dark"] {
+  /* Inverted light mode: canvas and ink swap roles. */
+  --canvas: #18181b;
+  --accent: #ffde59;
+  --ink: #fffdf8;
+  --on-accent: #000000;
+  --edge: #000000;
+  --foreground: #fffdf8;
+}
+
+@theme inline {
+  /* Neobrutalism 3-color palette (+ structural and on-accent tokens) */
+  --color-canvas: var(--canvas);
+  --color-ink: var(--ink);
+  --color-on-accent: var(--on-accent);
+  --color-edge: var(--edge);
+  --color-accent: var(--accent);
+  --color-foreground: var(--foreground);
+
+  /* Typography */
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Hard shadows, no blur */
+  --shadow-brutal-sm: 4px 4px 0 0 var(--edge);
+  --shadow-brutal: 5px 5px 0 0 var(--edge);
+  --shadow-brutal-lg: 6px 6px 0 0 var(--edge);
+  --shadow-brutal-press: 2px 2px 0 0 var(--edge);
+
+  /* Neobrutalism keeps corners square */
+  --radius-brutal: 0px;
+}
+
+/* Tailwind v4 has no `--border-width-*` theme namespace, so borders are utilities. */
+@utility border-brutal {
+  border-width: 3px;
+  border-style: solid;
+  border-color: var(--edge);
+}
+
+@utility border-brutal-thin {
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--edge);
+}
+
+/* Hover/press interaction: the hard shadow collapses toward the element. */
+@utility brutal-press {
+  transition:
+    box-shadow 120ms ease-out,
+    transform 120ms ease-out;
+
+  &:hover {
+    box-shadow: 2px 2px 0 0 var(--edge);
+    transform: translate(3px, 3px);
+  }
+}
+
+/* Static hover feedback for elements that must not move (e.g. photo cards). */
+@utility brutal-flat-hover {
+  transition: border-color 120ms ease-out;
+
+  &:hover {
+    border-color: var(--accent);
+  }
+}
+
+/* Flat moving stripes so the skeleton reads as "loading" without a spinner. */
+@utility brutal-skeleton {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 55%, transparent) 0 12px,
+    transparent 12px 24px
+  );
+  background-size: 200% 100%;
+  animation: brutal-skeleton-slide 1.2s linear infinite;
+}
+
+@keyframes brutal-skeleton-slide {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brutal-skeleton {
+    animation: none;
+  }
+}
+
+@layer base {
+  html {
+    /* Native form controls, scrollbars, and the tab ring follow the theme. */
+    color-scheme: light;
+  }
+
+  [data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--foreground);
+    font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--on-accent);
+  }
+
+  /* Focus ring stays visible in both themes. */
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
