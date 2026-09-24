@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, ShieldX } from "lucide-react";
+import { PostManager } from "@/components/admin/post-manager";
 import { getViewer } from "@/lib/auth/viewer";
-import { createClient } from "@/lib/supabase/server";
+import { fetchPosts } from "@/lib/posts-repository";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -52,15 +53,7 @@ export default async function AdminPage() {
     );
   }
 
-  const supabase = await createClient();
-  const { data: posts } = supabase
-    ? await supabase
-        .from("posts")
-        .select("id, title, category, created_at")
-        .order("created_at", { ascending: false })
-    : { data: null };
-
-  const rows = posts ?? [];
+  const posts = await fetchPosts();
 
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
@@ -73,37 +66,19 @@ export default async function AdminPage() {
             Manage posts
           </h1>
           <p className="font-mono text-xs leading-relaxed sm:text-sm">
-            {rows.length} {rows.length === 1 ? "post" : "posts"} in the
+            {posts.length} {posts.length === 1 ? "post" : "posts"} in the
             gallery.
           </p>
         </header>
 
-        <section className="space-y-3">
-          <h2 className="font-display text-lg font-bold sm:text-xl">Posts</h2>
-
-          <ul className="space-y-2">
-            {rows.map((row) => (
-              <li
-                key={row.id}
-                className="border-brutal-thin flex items-center justify-between gap-4 bg-canvas p-3"
-              >
-                <div className="min-w-0">
-                  <p className="truncate font-display text-sm font-bold sm:text-base">
-                    {row.title}
-                  </p>
-                  <p className="font-mono text-[11px]">{row.category}</p>
-                </div>
-
-                <Link
-                  href={`/photo/${row.id}`}
-                  className="border-brutal-thin shrink-0 px-3 py-1.5 font-display text-xs font-bold brutal-press"
-                >
-                  View
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <PostManager
+          posts={posts.map((post) => ({
+            id: post.id,
+            title: post.title,
+            category: post.category,
+            tags: post.tags,
+          }))}
+        />
       </div>
     </main>
   );

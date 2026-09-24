@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
+import { Menu, ShieldCheck, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -14,16 +14,19 @@ const aboutLink = { href: "/about", label: "About" };
 const categoryLink = { href: "/categories", label: "Category" };
 
 type SessionUser = {
+  id: string;
   email: string | null;
   displayName: string;
   /** Shortened for the fixed-width account box. */
   username: string;
+  isAdmin: boolean;
 };
 
 function toSessionUser(user: {
+  id: string;
   email?: string | null;
   user_metadata?: Record<string, unknown>;
-}): SessionUser {
+}): Omit<SessionUser, "isAdmin"> {
   const email = user.email ?? null;
   const name =
     (user.user_metadata?.full_name as string | undefined) ??
@@ -32,6 +35,7 @@ function toSessionUser(user: {
     "Member";
 
   return {
+    id: user.id,
     email,
     displayName: name,
     username: shortenUsername(name),
@@ -42,6 +46,10 @@ function toSessionUser(user: {
  * Reads the session in the browser instead of the root layout. Calling
  * `cookies()` in a layout forces every route to render dynamically, which would
  * give up static prerendering for the whole site just to label the nav.
+ *
+ * The admin flag comes from `profiles.role`, not from user metadata, so it
+ * reflects the database rather than a claim the client could edit. The nav link
+ * is only a convenience; /admin re-checks the role server-side.
  */
 function useSessionUser() {
   const [user, setUser] = useState<SessionUser | null>(null);
@@ -52,13 +60,38 @@ function useSessionUser() {
 
     let active = true;
 
-    supabase.auth.getUser().then(({ data }) => {
-      if (active && data.user) setUser(toSessionUser(data.user));
-    });
+    async function load() {
+      const {
+        data: { user: authUser },
+      } = await supabase!.auth.getUser();
+
+      if (!active || !authUser) {
+        if (active) setUser(null);
+        return;
+      }
+
+      const { data: profile } = await supabase!
+        .from("profiles")
+        .select("role")
+        .eq("id", authUser.id)
+        .maybeSingle();
+
+      if (!active) return;
+
+      setUser({
+        ...toSessionUser(authUser),
+        isAdmin: profile?.role === "admin",
+      });
+    }
+
+    load();
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ? toSessionUser(session.user) : null);
+      (event) => {
+        // Re-run on sign-in, sign-out, and token refresh so the admin link
+        // does not linger after the session changes.
+        if (event === "SIGNED_OUT") setUser(null);
+        else load();
       },
     );
 
@@ -139,6 +172,20 @@ export function SiteHeader() {
               {aboutLink.label}
             </Link>
           </li>
+          {user?.isAdmin && (
+            <li>
+              <Link
+                href="/admin"
+                aria-current={pathname.startsWith("/admin") ? "page" : undefined}
+                className={`border-brutal-thin flex items-center gap-1.5 px-4 py-1.5 font-display text-base font-bold brutal-press ${
+                  pathname.startsWith("/admin") ? "bg-accent text-on-accent" : ""
+                }`}
+              >
+                <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                Admin
+              </Link>
+            </li>
+          )}
           <li>
             {user ? (
               <AccountMenu user={user} onNavigate={closePanel} />
@@ -211,6 +258,21 @@ export function SiteHeader() {
               {aboutLink.label}
             </Link>
           </li>
+          {user?.isAdmin && (
+            <li>
+              <Link
+                href="/admin"
+                onClick={closePanel}
+                aria-current={pathname.startsWith("/admin") ? "page" : undefined}
+                className={`border-brutal-thin flex w-full items-center gap-2 px-4 py-2.5 font-display text-base font-bold brutal-press ${
+                  pathname.startsWith("/admin") ? "bg-accent text-on-accent" : ""
+                }`}
+              >
+                <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                Admin
+              </Link>
+            </li>
+          )}
           <li>
             {user ? (
               <AccountMenu user={user} onNavigate={closePanel} />
