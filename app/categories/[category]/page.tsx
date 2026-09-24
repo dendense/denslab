@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { GalleryGrid } from "@/components/gallery-grid";
 import { CATEGORIES, CATEGORY_SLUGS, postsByCategory } from "@/lib/posts";
 
@@ -36,7 +37,13 @@ export default async function CategoryPage({
           <span className="mx-2" aria-hidden="true">
             /
           </span>
-          <span>Category</span>
+          <Link href="/categories" className="underline underline-offset-4">
+            Categories
+          </Link>
+          <span className="mx-2" aria-hidden="true">
+            /
+          </span>
+          <span>{category}</span>
         </nav>
 
         <span className="border-brutal-thin inline-block bg-accent px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-on-accent sm:text-[11px]">
@@ -51,24 +58,13 @@ export default async function CategoryPage({
           {categoryPosts.length === 1 ? "entry" : "entries"} in this category.
         </p>
 
-        <ul className="mt-5 flex flex-wrap gap-2">
-          {CATEGORIES.map((name) => {
-            const active = name === category;
-            return (
-              <li key={name}>
-                <Link
-                  href={`/categories/${CATEGORY_SLUGS[name]}`}
-                  aria-current={active ? "page" : undefined}
-                  className={`border-brutal-thin block px-3 py-1.5 font-display text-xs font-bold brutal-press sm:text-sm ${
-                    active ? "bg-accent text-on-accent" : "bg-canvas"
-                  }`}
-                >
-                  {name}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <Link
+          href="/categories"
+          className="border-brutal-thin mt-5 inline-flex items-center gap-2 px-3 py-1.5 font-display text-sm font-bold brutal-press"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          All categories
+        </Link>
       </header>
 
       <section aria-label={`${category} gallery`}>

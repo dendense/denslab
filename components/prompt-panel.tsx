@@ -3,34 +3,49 @@
 import { Check, Copy, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import type { PostMetadata } from "@/lib/posts";
+import type { AiMetadata, PhotoMetadata, Post } from "@/lib/posts";
 
-const META_LABELS: { key: keyof PostMetadata; label: string }[] = [
+const AI_FIELDS: { key: keyof AiMetadata; label: string }[] = [
   { key: "model", label: "Model" },
-  { key: "sampler", label: "Sampler" },
+  { key: "platform", label: "Platforms" },
   { key: "seed", label: "Seed" },
-  { key: "steps", label: "Steps" },
-  { key: "cfgScale", label: "CFG" },
-  { key: "aspectRatio", label: "Ratio" },
+];
+
+const PHOTO_FIELDS: { key: keyof PhotoMetadata; label: string }[] = [
+  { key: "body", label: "Body" },
+  { key: "lens", label: "Lens" },
+  { key: "aperture", label: "Aperture" },
+  { key: "shutterSpeed", label: "Shutter" },
+  { key: "iso", label: "ISO" },
 ];
 
 /**
- * Prompt + generation metadata. Guests get a blurred, locked preview; signed-in
- * users get the real values and a copy button.
+ * Gated technical details, shaped by category: AI posts reveal the prompt and
+ * generation settings, Photoshoot posts reveal capture settings. Guests get a
+ * blurred preview and a login call to action in both cases.
  */
 export function PromptPanel({
-  metadata,
+  post,
   isAuthenticated,
 }: {
-  metadata: PostMetadata;
+  post: Post;
   isAuthenticated: boolean;
 }) {
   const [copied, setCopied] = useState(false);
 
+  const isAi = post.category === "AI Generated";
+  const heading = isAi ? "Prompt & Metadata" : "Capture Settings";
+  const cta = isAi
+    ? "Login or register to reveal the full prompt."
+    : "Login or register to reveal the capture settings.";
+  const ctaButton = isAi ? "Login to reveal prompt" : "Login to reveal settings";
+
   async function copyPrompt() {
-    const payload = metadata.negativePrompt
-      ? `${metadata.prompt}\n\nNegative prompt: ${metadata.negativePrompt}`
-      : metadata.prompt;
+    if (!isAi) return;
+
+    const payload = post.metadata.negativePrompt
+      ? `${post.metadata.prompt}\n\nNegative prompt: ${post.metadata.negativePrompt}`
+      : post.metadata.prompt;
 
     try {
       await navigator.clipboard.writeText(payload);
@@ -43,18 +58,23 @@ export function PromptPanel({
 
   return (
     <section
-      aria-labelledby="prompt-heading"
+      aria-labelledby="details-heading"
       className="border-brutal bg-canvas shadow-brutal-sm"
     >
       <header className="flex items-center justify-between gap-3 border-b-brutal px-4 py-3 sm:px-5">
         <h2
-          id="prompt-heading"
+          id="details-heading"
           className="font-display text-base font-bold sm:text-lg"
         >
-          Prompt &amp; Metadata
+          {heading}
         </h2>
 
-        {isAuthenticated ? (
+        {!isAuthenticated ? (
+          <span className="border-brutal-thin flex shrink-0 items-center gap-1 bg-canvas px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wide">
+            <Lock className="h-3 w-3" aria-hidden="true" />
+            Locked
+          </span>
+        ) : isAi ? (
           <button
             type="button"
             onClick={copyPrompt}
@@ -67,12 +87,7 @@ export function PromptPanel({
             )}
             {copied ? "Copied" : "Copy Prompt"}
           </button>
-        ) : (
-          <span className="border-brutal-thin flex shrink-0 items-center gap-1 bg-canvas px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wide">
-            <Lock className="h-3 w-3" aria-hidden="true" />
-            Locked
-          </span>
-        )}
+        ) : null}
       </header>
 
       <div className="relative">
@@ -82,32 +97,40 @@ export function PromptPanel({
             isAuthenticated ? "" : "select-none blur-[6px]"
           }`}
         >
-          <div className="space-y-1.5">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wide">
-              Positive prompt
-            </p>
-            <p className="break-words font-mono text-xs leading-relaxed">
-              {metadata.prompt}
-            </p>
-          </div>
+          {isAi && (
+            <>
+              <div className="space-y-1.5">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-wide">
+                  Positive prompt
+                </p>
+                <p className="break-words font-mono text-xs leading-relaxed">
+                  {post.metadata.prompt}
+                </p>
+              </div>
 
-          <div className="space-y-1.5">
-            <p className="font-mono text-[10px] font-bold uppercase tracking-wide">
-              Negative prompt
-            </p>
-            <p className="break-words font-mono text-xs leading-relaxed">
-              {metadata.negativePrompt || "—"}
-            </p>
-          </div>
+              <div className="space-y-1.5">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-wide">
+                  Negative prompt
+                </p>
+                <p className="break-words font-mono text-xs leading-relaxed">
+                  {post.metadata.negativePrompt || "—"}
+                </p>
+              </div>
+            </>
+          )}
 
-          <dl className="grid grid-cols-2 gap-2 border-t-brutal-thin pt-4 sm:grid-cols-3">
-            {META_LABELS.map(({ key, label }) => (
+          <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {(isAi ? AI_FIELDS : PHOTO_FIELDS).map(({ key, label }) => (
               <div key={key} className="space-y-1">
                 <dt className="font-mono text-[10px] font-bold uppercase tracking-wide">
                   {label}
                 </dt>
                 <dd className="break-all font-mono text-xs">
-                  {String(metadata[key])}
+                  {isAi
+                    ? String(post.metadata[key as keyof AiMetadata])
+                    : String(
+                        post.photoMetadata[key as keyof PhotoMetadata],
+                      )}
                 </dd>
               </div>
             ))}
@@ -117,14 +140,14 @@ export function PromptPanel({
         {!isAuthenticated && (
           <div className="border-t-brutal absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 bg-canvas p-5 text-center sm:p-6">
             <p className="max-w-xs font-display text-sm font-bold sm:text-base">
-              Login or register to reveal the full prompt.
+              {cta}
             </p>
             <Link
               href="/login"
               className="border-brutal-thin inline-flex items-center gap-2 bg-accent px-4 py-2 font-display text-sm font-bold text-on-accent shadow-brutal-sm brutal-press"
             >
               <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-              Login to reveal prompt
+              {ctaButton}
             </Link>
           </div>
         )}

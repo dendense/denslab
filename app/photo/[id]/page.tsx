@@ -122,10 +122,7 @@ export default async function PhotoDetailPage({
             </dl>
           </div>
 
-          <PromptPanel
-            metadata={post.metadata}
-            isAuthenticated={authenticated}
-          />
+          <PromptPanel post={post} isAuthenticated={authenticated} />
         </div>
       </div>
     </main>

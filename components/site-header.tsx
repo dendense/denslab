@@ -7,14 +7,11 @@ import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { createClient } from "@/lib/supabase/client";
 import { shortenUsername } from "@/lib/format-username";
-import { CATEGORIES, CATEGORY_SLUGS } from "@/lib/posts";
-
-const categoryLinks = CATEGORIES.map((category) => ({
-  href: `/categories/${CATEGORY_SLUGS[category]}`,
-  label: category,
-}));
 
 const aboutLink = { href: "/about", label: "About" };
+
+/** One nav entry for browsing; the picker lives on the category page itself. */
+const categoryLink = { href: "/categories", label: "Category" };
 
 type SessionUser = {
   email: string | null;
@@ -116,22 +113,21 @@ export function SiteHeader() {
 
         {/* Desktop navigation */}
         <ul className="hidden items-center gap-2 md:flex lg:gap-3">
-          {categoryLinks.map((link) => {
-            const active = pathname === link.href;
-            return (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  aria-current={active ? "page" : undefined}
-                  className={`border-brutal-thin block px-4 py-1.5 font-display text-base font-bold brutal-press ${
-                    active ? "bg-accent text-on-accent" : ""
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            );
-          })}
+          <li>
+            <Link
+              href={categoryLink.href}
+              aria-current={
+                pathname.startsWith(categoryLink.href) ? "page" : undefined
+              }
+              className={`border-brutal-thin block px-4 py-1.5 font-display text-base font-bold brutal-press ${
+                pathname.startsWith(categoryLink.href)
+                  ? "bg-accent text-on-accent"
+                  : ""
+              }`}
+            >
+              {categoryLink.label}
+            </Link>
+          </li>
           <li>
             <Link
               href={aboutLink.href}
@@ -187,23 +183,22 @@ export function SiteHeader() {
         className="border-t-brutal bg-canvas md:hidden"
       >
         <ul className="flex flex-col gap-2 px-4 py-4 sm:px-6">
-          {categoryLinks.map((link) => {
-            const active = pathname === link.href;
-            return (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  onClick={closePanel}
-                  aria-current={active ? "page" : undefined}
-                  className={`border-brutal-thin block w-full px-4 py-2.5 font-display text-base font-bold brutal-press ${
-                    active ? "bg-accent text-on-accent" : ""
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            );
-          })}
+          <li>
+            <Link
+              href={categoryLink.href}
+              onClick={closePanel}
+              aria-current={
+                pathname.startsWith(categoryLink.href) ? "page" : undefined
+              }
+              className={`border-brutal-thin block w-full px-4 py-2.5 font-display text-base font-bold brutal-press ${
+                pathname.startsWith(categoryLink.href)
+                  ? "bg-accent text-on-accent"
+                  : ""
+              }`}
+            >
+              {categoryLink.label}
+            </Link>
+          </li>
           <li>
             <Link
               href={aboutLink.href}
