@@ -6,6 +6,14 @@ import { ArrowLeft } from "lucide-react";
 import { PromptPanel } from "@/components/prompt-panel";
 import { Badge } from "@/components/ui/badge";
 import { getPostById, imgurFullUrl, posts } from "@/lib/posts";
+import { createClient } from "@/lib/supabase/server";
+
+/**
+ * The prompt panel depends on the request session, so this route must render
+ * per request. Without this, Next prerenders the guest (locked) variant once
+ * and serves it to signed-in users too.
+ */
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return posts.map((post) => ({ id: post.id }));
@@ -26,11 +34,19 @@ export async function generateMetadata({
 }
 
 /**
- * Auth is not wired to Supabase yet. Guests are the current default, so the
- * gated prompt path is the one exercised end to end for now.
+ * Reads the session on the server. Guests (and the not-yet-configured case)
+ * get `false`, which renders the locked prompt panel.
  */
-function isAuthenticated() {
-  return false;
+async function hasSession() {
+  const supabase = await createClient();
+
+  if (!supabase) return false;
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return Boolean(user);
 }
 
 export default async function PhotoDetailPage({
@@ -41,7 +57,7 @@ export default async function PhotoDetailPage({
 
   if (!post) notFound();
 
-  const authenticated = isAuthenticated();
+  const authenticated = await hasSession();
 
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">

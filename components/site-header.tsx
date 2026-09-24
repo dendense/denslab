@@ -11,7 +11,13 @@ const navLinks = [
   { href: "/about", label: "About" },
 ];
 
-export function SiteHeader() {
+type SessionUser = {
+  email: string | null;
+  displayName: string;
+  initial: string;
+};
+
+export function SiteHeader({ user = null }: { user?: SessionUser | null }) {
   const pathname = usePathname();
   // Panel closes on navigation without an effect: state records which path the
   // panel was opened on, and a different pathname renders it closed.
@@ -63,12 +69,16 @@ export function SiteHeader() {
             </li>
           ))}
           <li>
-            <Link
-              href="/login"
-              className="border-brutal-thin block bg-accent px-4 py-1.5 font-display text-base font-bold text-on-accent brutal-press"
-            >
-              Login
-            </Link>
+            {user ? (
+              <AccountMenu user={user} onNavigate={closePanel} />
+            ) : (
+              <Link
+                href="/login"
+                className="border-brutal-thin block bg-accent px-4 py-1.5 font-display text-base font-bold text-on-accent brutal-press"
+              >
+                Login
+              </Link>
+            )}
           </li>
           <li>
             <ThemeToggle />
@@ -114,16 +124,56 @@ export function SiteHeader() {
             </li>
           ))}
           <li>
-            <Link
-              href="/login"
-              onClick={closePanel}
-              className="border-brutal-thin block w-full bg-accent px-4 py-2.5 font-display text-base font-bold text-on-accent brutal-press"
-            >
-              Login
-            </Link>
+            {user ? (
+              <AccountMenu user={user} onNavigate={closePanel} />
+            ) : (
+              <Link
+                href="/login"
+                onClick={closePanel}
+                className="border-brutal-thin block w-full bg-accent px-4 py-2.5 font-display text-base font-bold text-on-accent brutal-press"
+              >
+                Login
+              </Link>
+            )}
           </li>
         </ul>
       </div>
     </header>
+  );
+}
+
+/**
+ * Signed-in state for the nav. A plain form POST to /auth/signout keeps
+ * sign-out working without an extra client component.
+ */
+function AccountMenu({
+  user,
+  onNavigate,
+}: {
+  user: SessionUser;
+  onNavigate: () => void;
+}) {
+  return (
+    <div className="border-brutal-thin flex items-center gap-2 px-2 py-1">
+      <span
+        aria-hidden="true"
+        title={user.email ?? undefined}
+        className="flex h-6 w-6 items-center justify-center bg-accent font-display text-xs font-bold text-on-accent"
+      >
+        {user.initial}
+      </span>
+      <span className="max-w-[8rem] truncate font-mono text-xs">
+        {user.displayName}
+      </span>
+      <form action="/auth/signout" method="post">
+        <button
+          type="submit"
+          onClick={onNavigate}
+          className="border-brutal-thin px-2 py-0.5 font-display text-xs font-bold brutal-press"
+        >
+          Sign out
+        </button>
+      </form>
+    </div>
   );
 }
