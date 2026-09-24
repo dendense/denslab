@@ -98,19 +98,75 @@ function demoCards(): PostCardData[] {
 }
 
 /**
+ * Columns matched by search.
+ *
+ * `tags` is a `text[]` column, so it needs the array `cs` (contains) operator
+ * rather than `ilike`. Mixing the two in one filter makes Postgres reject the
+ * whole query with "operator does not exist: text[] ~~* unknown", which silently
+ * disables search on every column, not just tags.
+ *
+ * `category` is included so typing "Photoshoot" finds those posts instead of
+ * dead-ending; the dedicated category pages remain the better way to browse.
+ */
+const SEARCH_TEXT_COLUMNS = ["title", "description", "category"] as const;
+
+/**
+ * Builds a PostgREST `or` filter for a search term.
+ *
+ * The term is escaped for the PostgREST filter grammar: commas and parentheses
+ * are structural there, so a raw term containing them would either error or
+ * silently match something else. `%` and `_` are ILIKE wildcards and are
+ * escaped so a search for "s_1" does not match "sx1".
+ */
+function buildSearchFilter(term: string): string {
+  const escapedForLike = term
+    .replace(/\\/g, "\\\\")
+    .replace(/%/g, "\\%")
+    .replace(/_/g, "\\_");
+
+  const escapedForOr = escapedForLike.replace(/,/g, "\\,").replace(/[()]/g, "");
+
+  const textFilters = SEARCH_TEXT_COLUMNS.map(
+    (column) => `${column}.ilike.%${escapedForOr}%`,
+  );
+
+  // Array containment needs the term wrapped in braces. Braces and quotes are
+  // stripped from the term first so a value containing them cannot break the
+  // array literal syntax.
+  const arrayTerm = escapedForOr.replace(/[{}"\\]/g, "");
+  const tagFilter = arrayTerm ? `tags.cs.{${arrayTerm}}` : null;
+
+  return tagFilter ? [...textFilters, tagFilter].join(",") : textFilters.join(",");
+}
+
+/** Case-insensitive local match, mirroring the database behaviour. */
+function matchesSearch(post: PostCardData, term: string): boolean {
+  const needle = term.toLowerCase();
+  return (
+    post.title.toLowerCase().includes(needle) ||
+    post.description.toLowerCase().includes(needle) ||
+    post.category.toLowerCase().includes(needle) ||
+    post.tags.some((tag) => tag.toLowerCase().includes(needle))
+  );
+}
+
+/**
  * Paged list for the gallery and category pages. Uses `count: "exact"` so the
  * pagination control knows the page count without a second query.
  */
 async function readPostPage(
   page: number,
   category?: PostCategory,
+  search?: string,
 ): Promise<PostPage> {
   const supabase = createPublicClient();
 
+  const term = search?.trim() ?? "";
+
   if (!supabase) {
-    const all = demoCards().filter(
-      (post) => !category || post.category === category,
-    );
+    let all = demoCards();
+    if (category) all = all.filter((post) => post.category === category);
+    if (term) all = all.filter((post) => matchesSearch(post, term));
     return paginate(all, page);
   }
 
@@ -123,23 +179,27 @@ async function readPostPage(
     .range(from, from + POSTS_PER_PAGE - 1);
 
   if (category) query = query.eq("category", category);
+  if (term) query = query.or(buildSearchFilter(term));
 
   const { data, error, count } = await query;
 
   if (error || !data) {
-    const all = demoCards().filter(
-      (post) => !category || post.category === category,
-    );
+    // Logged rather than swallowed: silently falling back to demo data once hid
+    // a broken search filter, making a real query bug look like "no results".
+    console.error("[posts] list query failed:", error?.message ?? "no data");
+    let all = demoCards();
+    if (category) all = all.filter((post) => post.category === category);
+    if (term) all = all.filter((post) => matchesSearch(post, term));
     return paginate(all, page);
   }
 
   const total = count ?? data.length;
 
-  // An empty table usually means the seed has not run yet during setup.
-  if (total === 0) {
-    const all = demoCards().filter(
-      (post) => !category || post.category === category,
-    );
+  // An empty table usually means the seed has not run yet during setup. A
+  // filtered search legitimately returns zero rows, so that case is excluded.
+  if (total === 0 && !term) {
+    let all = demoCards();
+    if (category) all = all.filter((post) => post.category === category);
     return paginate(all, page);
   }
 
@@ -162,20 +222,28 @@ function paginate(all: PostCardData[], page: number): PostPage {
 }
 
 /**
- * Cached page read, keyed by page and category so each combination is stored
- * separately and invalidated together by tag.
+ * Cached page read.
+ *
+ * The cached function takes its inputs as real arguments. `unstable_cache`
+ * memoizes on the arguments of the wrapped function, so closing over the term
+ * instead would make every call look identical and serve the first result to
+ * every search term.
  */
 export async function fetchPostPage(
   page: number,
   category?: PostCategory,
+  search?: string,
 ): Promise<PostPage> {
   const safePage = Number.isInteger(page) && page > 0 ? page : 1;
+  const term = (search ?? "").trim().toLowerCase().slice(0, 80);
+  const key = category ?? "all";
 
   return unstable_cache(
-    () => readPostPage(safePage, category),
-    ["posts-page", String(safePage), category ?? "all"],
+    (p: number, c: PostCategory | "all", t: string) =>
+      readPostPage(p, c === "all" ? undefined : c, t),
+    ["posts-page"],
     { tags: [POSTS_CACHE_TAG] },
-  )();
+  )(safePage, key, term);
 }
 
 /**
@@ -262,11 +330,17 @@ async function readPostById(id: string): Promise<Post | undefined> {
 
 /**
  * Cached per-id read, used by the public detail page.
+ *
+ * The id is passed as an argument rather than closed over: `unstable_cache`
+ * memoizes on function arguments, so a closure would make every post id resolve
+ * to whichever one was cached first.
  */
 export async function fetchPostById(id: string): Promise<Post | undefined> {
-  return unstable_cache(() => readPostById(id), ["post", id], {
-    tags: [POSTS_CACHE_TAG],
-  })();
+  return unstable_cache(
+    (postId: string) => readPostById(postId),
+    ["post"],
+    { tags: [POSTS_CACHE_TAG] },
+  )(id);
 }
 
 /**

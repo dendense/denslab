@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { GalleryGrid } from "@/components/gallery-grid";
 import { Pagination } from "@/components/pagination";
+import { SearchBox } from "@/components/search-box";
 import { CATEGORIES, CATEGORY_SLUGS } from "@/lib/posts";
 import { fetchPostPage } from "@/lib/posts-repository";
 
@@ -16,6 +17,10 @@ export function generateStaticParams() {
   return CATEGORIES.map((category) => ({ category: CATEGORY_SLUGS[category] }));
 }
 
+function first(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
 export default async function CategoryPage({
   params,
   searchParams,
@@ -26,10 +31,16 @@ export default async function CategoryPage({
   if (!category) notFound();
 
   const query = await searchParams;
-  const rawPage = Array.isArray(query.page) ? query.page[0] : query.page;
-  const page = Number.parseInt(rawPage ?? "1", 10) || 1;
+  const page = Number.parseInt(first(query.page) ?? "1", 10) || 1;
+  const search = (first(query.q) ?? "").trim();
 
-  const { posts, total, pageCount } = await fetchPostPage(page, category);
+  const { posts, total, pageCount } = await fetchPostPage(
+    page,
+    category,
+    search,
+  );
+
+  const preserved = search ? new URLSearchParams({ q: search }).toString() : "";
 
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
@@ -61,8 +72,17 @@ export default async function CategoryPage({
           {category}
         </h1>
         <p className="mt-3 font-mono text-xs leading-relaxed sm:text-sm">
-          {total} {total === 1 ? "entry" : "entries"} in this category.
+          {search
+            ? `${total} ${total === 1 ? "result" : "results"} for “${search}” in ${category}.`
+            : `${total} ${total === 1 ? "entry" : "entries"} in this category.`}
         </p>
+
+        <div className="mt-5">
+          <SearchBox
+            action={`/categories/${slug}`}
+            defaultValue={search}
+          />
+        </div>
 
         <Link
           href="/categories"
@@ -74,13 +94,31 @@ export default async function CategoryPage({
       </header>
 
       <section aria-label={`${category} gallery`}>
-        <GalleryGrid posts={posts} />
+        {search && posts.length === 0 ? (
+          <div className="border-brutal bg-canvas p-5 shadow-brutal-sm sm:p-6">
+            <p className="font-display text-base font-bold sm:text-lg">
+              Nothing matched “{search}” in {category}.
+            </p>
+            <p className="mt-2 font-mono text-xs leading-relaxed sm:text-sm">
+              Try a shorter word, or search the whole gallery instead.
+            </p>
+            <Link
+              href="/"
+              className="border-brutal-thin mt-4 inline-flex items-center gap-2 px-3 py-1.5 font-display text-sm font-bold brutal-press"
+            >
+              Search all posts
+            </Link>
+          </div>
+        ) : (
+          <GalleryGrid posts={posts} />
+        )}
       </section>
 
       <Pagination
         page={page}
         pageCount={pageCount}
         basePath={`/categories/${slug}`}
+        query={preserved}
       />
     </main>
   );
