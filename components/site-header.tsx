@@ -169,7 +169,7 @@ function AccountMenu({
         <button
           type="submit"
           onClick={onNavigate}
-          className="border-brutal-thin px-2 py-0.5 font-display text-xs font-bold brutal-press"
+          className="border-brutal-thin px-2 py-0.5 font-display text-xs font-bold brutal-fade"
         >
           Sign out
         </button>

@@ -85,6 +85,24 @@
   }
 }
 
+/*
+ * Quiet hover: opacity fade only, no shadow collapse or movement. Used for
+ * low-emphasis actions such as Sign out.
+ */
+@utility brutal-fade {
+  transition: opacity 160ms ease-out;
+
+  &:hover {
+    opacity: 0.65;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brutal-fade {
+    transition: none;
+  }
+}
+
 /* Flat moving stripes so the skeleton reads as "loading" without a spinner. */
 @utility brutal-skeleton {
   background-image: repeating-linear-gradient(
