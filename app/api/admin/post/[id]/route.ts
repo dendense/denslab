@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getViewer } from "@/lib/auth/viewer";
-import { fetchPostById } from "@/lib/posts-repository";
+import { fetchPostByIdFresh } from "@/lib/posts-repository";
 
 /**
  * Returns one post for the admin edit form. The list view only carries the
@@ -20,7 +20,7 @@ export async function GET(
   }
 
   const { id } = await params;
-  const post = await fetchPostById(id);
+  const post = await fetchPostByIdFresh(id);
 
   if (!post) {
     return NextResponse.json({ error: "Post not found." }, { status: 404 });

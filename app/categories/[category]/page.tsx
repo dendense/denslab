@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { GalleryGrid } from "@/components/gallery-grid";
+import { Pagination } from "@/components/pagination";
 import { CATEGORIES, CATEGORY_SLUGS } from "@/lib/posts";
-import { fetchPosts } from "@/lib/posts-repository";
+import { fetchPostPage } from "@/lib/posts-repository";
 
 export const metadata: Metadata = {
   title: "Categories",
@@ -17,15 +18,18 @@ export function generateStaticParams() {
 
 export default async function CategoryPage({
   params,
+  searchParams,
 }: PageProps<"/categories/[category]">) {
   const { category: slug } = await params;
   const category = CATEGORIES.find((name) => CATEGORY_SLUGS[name] === slug);
 
   if (!category) notFound();
 
-  const categoryPosts = (await fetchPosts()).filter(
-    (post) => post.category === category,
-  );
+  const query = await searchParams;
+  const rawPage = Array.isArray(query.page) ? query.page[0] : query.page;
+  const page = Number.parseInt(rawPage ?? "1", 10) || 1;
+
+  const { posts, total, pageCount } = await fetchPostPage(page, category);
 
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
@@ -57,8 +61,7 @@ export default async function CategoryPage({
           {category}
         </h1>
         <p className="mt-3 font-mono text-xs leading-relaxed sm:text-sm">
-          {categoryPosts.length}{" "}
-          {categoryPosts.length === 1 ? "entry" : "entries"} in this category.
+          {total} {total === 1 ? "entry" : "entries"} in this category.
         </p>
 
         <Link
@@ -71,8 +74,14 @@ export default async function CategoryPage({
       </header>
 
       <section aria-label={`${category} gallery`}>
-        <GalleryGrid posts={categoryPosts} />
+        <GalleryGrid posts={posts} />
       </section>
+
+      <Pagination
+        page={page}
+        pageCount={pageCount}
+        basePath={`/categories/${slug}`}
+      />
     </main>
   );
 }

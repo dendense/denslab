@@ -337,11 +337,20 @@ export function getPostById(id: string) {
   return posts.find((post) => post.id === id);
 }
 
-/** Gallery grid uses Imgur's medium thumbnail; the detail page uses full size. */
+/**
+ * Grid thumbnail source.
+ *
+ * `h` is Imgur's "huge" variant (~1024px on the long edge). The previous `m`
+ * variant (~320px) was smaller than the widths `next/image` requests for a card
+ * on a wide screen, so the optimizer upscaled a low-resolution source and the
+ * result looked soft. `h` covers the largest card box and is still downscaled
+ * by the optimizer for small viewports.
+ */
 export function imgurThumbUrl(imgurId: string) {
-  return `https://i.imgur.com/${imgurId}m.jpg`;
+  return `https://i.imgur.com/${imgurId}h.jpg`;
 }
 
+/** Detail page source: Imgur serves the original at the bare id. */
 export function imgurFullUrl(imgurId: string) {
   return `https://i.imgur.com/${imgurId}.jpg`;
 }

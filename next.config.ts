@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
     root: process.cwd(),
   },
   images: {
+    // Next only serves qualities explicitly allowed here. 85 is used by the
+    // gallery cards; 75 stays as the default for everything else.
+    qualities: [75, 85],
     remotePatterns: [
       {
         protocol: "https",

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { ArrowLeft, ShieldX } from "lucide-react";
 import { PostManager } from "@/components/admin/post-manager";
 import { getViewer } from "@/lib/auth/viewer";
-import { fetchPosts } from "@/lib/posts-repository";
+import { fetchAllCards } from "@/lib/posts-repository";
 
 export const metadata: Metadata = {
   title: "Admin",
@@ -53,7 +53,7 @@ export default async function AdminPage() {
     );
   }
 
-  const posts = await fetchPosts();
+  const posts = await fetchAllCards();
 
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
