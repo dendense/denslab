@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { createClient } from "@/lib/supabase/client";
+import { shortenUsername } from "@/lib/format-username";
 import { CATEGORIES, CATEGORY_SLUGS } from "@/lib/posts";
 
 const categoryLinks = CATEGORIES.map((category) => ({
@@ -18,7 +19,8 @@ const aboutLink = { href: "/about", label: "About" };
 type SessionUser = {
   email: string | null;
   displayName: string;
-  initial: string;
+  /** Shortened for the fixed-width account box. */
+  username: string;
 };
 
 function toSessionUser(user: {
@@ -35,7 +37,7 @@ function toSessionUser(user: {
   return {
     email,
     displayName: name,
-    initial: name.charAt(0).toUpperCase(),
+    username: shortenUsername(name),
   };
 }
 
@@ -234,8 +236,9 @@ export function SiteHeader() {
 }
 
 /**
- * Signed-in state for the nav. A plain form POST to /auth/signout keeps
- * sign-out working without an extra client component.
+ * Signed-in state for the nav: one compact box with the username and a sign
+ * out button. A plain form POST to /auth/signout keeps sign-out working
+ * without an extra client component.
  */
 function AccountMenu({
   user,
@@ -244,18 +247,20 @@ function AccountMenu({
   user: SessionUser;
   onNavigate: () => void;
 }) {
+  const onSettings = usePathname() === "/settings";
+
   return (
-    <div className="border-brutal-thin flex items-center gap-2 px-2 py-1">
-      <span
-        aria-hidden="true"
-        title={user.email ?? undefined}
-        className="flex h-6 w-6 items-center justify-center bg-accent font-display text-xs font-bold text-on-accent"
+    <div className="border-brutal-thin flex items-center gap-2 bg-canvas px-2 py-1.5">
+      <Link
+        href="/settings"
+        onClick={onNavigate}
+        title={user.displayName}
+        aria-current={onSettings ? "page" : undefined}
+        className="max-w-[6rem] truncate font-display text-sm font-bold underline-offset-4 brutal-fade hover:underline"
       >
-        {user.initial}
-      </span>
-      <span className="max-w-[8rem] truncate font-mono text-xs">
-        {user.displayName}
-      </span>
+        {user.username}
+      </Link>
+
       <form action="/auth/signout" method="post">
         <button
           type="submit"
