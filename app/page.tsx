@@ -1,4 +1,5 @@
 import { GalleryGrid } from "@/components/gallery-grid";
+import { posts } from "@/lib/posts";
 
 export default function Home() {
   return (
@@ -14,7 +15,7 @@ export default function Home() {
       </header>
 
       <section aria-label="Photo gallery">
-        <GalleryGrid />
+        <GalleryGrid posts={posts} />
       </section>
     </main>
   );

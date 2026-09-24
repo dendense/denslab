@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { Lock } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -14,13 +14,7 @@ export const cardVariants: Variants = {
   visible: { opacity: 1, y: 0 },
 };
 
-type PostCardProps = {
-  post: Post;
-  /** Guests see a locked prompt badge; signed-in users do not. */
-  isGuest?: boolean;
-};
-
-export function PostCard({ post, isGuest = true }: PostCardProps) {
+export function PostCard({ post }: { post: Post }) {
   const [loaded, setLoaded] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
@@ -63,12 +57,10 @@ export function PostCard({ post, isGuest = true }: PostCardProps) {
             {post.title}
           </h2>
 
-          {isGuest && (
-            <span className="border-brutal-thin flex shrink-0 items-center gap-1 bg-canvas px-1.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-ink sm:px-2">
-              <Lock className="h-3 w-3" aria-hidden="true" />
-              Locked
-            </span>
-          )}
+          <span className="border-brutal-thin flex shrink-0 items-center gap-1 bg-accent px-1.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-on-accent sm:px-2">
+            Details
+            <ArrowRight className="h-3 w-3" aria-hidden="true" />
+          </span>
         </div>
       </Link>
     </motion.article>

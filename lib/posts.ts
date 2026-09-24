@@ -322,6 +322,27 @@ export function postsByOrientation(orientation: PostOrientation) {
   return posts.filter((post) => post.orientation === orientation);
 }
 
+/** Posts in one category, in gallery order. */
+export function postsByCategory(category: PostCategory) {
+  return posts.filter((post) => post.category === category);
+}
+
+/**
+ * URL-safe slug per category. Kept explicit rather than auto-generated so the
+ * route segment stays stable if a display label is ever reworded.
+ */
+export const CATEGORY_SLUGS: Record<PostCategory, string> = {
+  "AI Generated": "ai-generated",
+  "Conceptual Photo": "conceptual-photo",
+};
+
+export const CATEGORIES = Object.keys(CATEGORY_SLUGS) as PostCategory[];
+
+export function categoryFromSlug(slug: string): PostCategory | undefined {
+  const match = CATEGORIES.find((category) => CATEGORY_SLUGS[category] === slug);
+  return match;
+}
+
 /** Single post for the detail route, or `undefined` when the id is unknown. */
 export function getPostById(id: string) {
   return posts.find((post) => post.id === id);

@@ -5,11 +5,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { createClient } from "@/lib/supabase/client";
+import { CATEGORIES, CATEGORY_SLUGS } from "@/lib/posts";
 
-const navLinks = [
-  { href: "/", label: "Gallery" },
-  { href: "/about", label: "About" },
-];
+const categoryLinks = CATEGORIES.map((category) => ({
+  href: `/categories/${CATEGORY_SLUGS[category]}`,
+  label: category,
+}));
+
+const aboutLink = { href: "/about", label: "About" };
 
 type SessionUser = {
   email: string | null;
@@ -17,8 +21,60 @@ type SessionUser = {
   initial: string;
 };
 
-export function SiteHeader({ user = null }: { user?: SessionUser | null }) {
+function toSessionUser(user: {
+  email?: string | null;
+  user_metadata?: Record<string, unknown>;
+}): SessionUser {
+  const email = user.email ?? null;
+  const name =
+    (user.user_metadata?.full_name as string | undefined) ??
+    (user.user_metadata?.name as string | undefined) ??
+    email ??
+    "Member";
+
+  return {
+    email,
+    displayName: name,
+    initial: name.charAt(0).toUpperCase(),
+  };
+}
+
+/**
+ * Reads the session in the browser instead of the root layout. Calling
+ * `cookies()` in a layout forces every route to render dynamically, which would
+ * give up static prerendering for the whole site just to label the nav.
+ */
+function useSessionUser() {
+  const [user, setUser] = useState<SessionUser | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    if (!supabase) return;
+
+    let active = true;
+
+    supabase.auth.getUser().then(({ data }) => {
+      if (active && data.user) setUser(toSessionUser(data.user));
+    });
+
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ? toSessionUser(session.user) : null);
+      },
+    );
+
+    return () => {
+      active = false;
+      subscription.subscription.unsubscribe();
+    };
+  }, []);
+
+  return user;
+}
+
+export function SiteHeader() {
   const pathname = usePathname();
+  const user = useSessionUser();
   // Panel closes on navigation without an effect: state records which path the
   // panel was opened on, and a different pathname renders it closed.
   const [openedOn, setOpenedOn] = useState<string | null>(null);
@@ -58,16 +114,33 @@ export function SiteHeader({ user = null }: { user?: SessionUser | null }) {
 
         {/* Desktop navigation */}
         <ul className="hidden items-center gap-2 md:flex lg:gap-3">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                className="border-brutal-thin block px-4 py-1.5 font-display text-base font-bold brutal-press"
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
+          {categoryLinks.map((link) => {
+            const active = pathname === link.href;
+            return (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`border-brutal-thin block px-4 py-1.5 font-display text-base font-bold brutal-press ${
+                    active ? "bg-accent text-on-accent" : ""
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            );
+          })}
+          <li>
+            <Link
+              href={aboutLink.href}
+              aria-current={pathname === aboutLink.href ? "page" : undefined}
+              className={`border-brutal-thin block px-4 py-1.5 font-display text-base font-bold brutal-press ${
+                pathname === aboutLink.href ? "bg-accent text-on-accent" : ""
+              }`}
+            >
+              {aboutLink.label}
+            </Link>
+          </li>
           <li>
             {user ? (
               <AccountMenu user={user} onNavigate={closePanel} />
@@ -112,17 +185,35 @@ export function SiteHeader({ user = null }: { user?: SessionUser | null }) {
         className="border-t-brutal bg-canvas md:hidden"
       >
         <ul className="flex flex-col gap-2 px-4 py-4 sm:px-6">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                onClick={closePanel}
-                className="border-brutal-thin block w-full px-4 py-2.5 font-display text-base font-bold brutal-press"
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
+          {categoryLinks.map((link) => {
+            const active = pathname === link.href;
+            return (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  onClick={closePanel}
+                  aria-current={active ? "page" : undefined}
+                  className={`border-brutal-thin block w-full px-4 py-2.5 font-display text-base font-bold brutal-press ${
+                    active ? "bg-accent text-on-accent" : ""
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            );
+          })}
+          <li>
+            <Link
+              href={aboutLink.href}
+              onClick={closePanel}
+              aria-current={pathname === aboutLink.href ? "page" : undefined}
+              className={`border-brutal-thin block w-full px-4 py-2.5 font-display text-base font-bold brutal-press ${
+                pathname === aboutLink.href ? "bg-accent text-on-accent" : ""
+              }`}
+            >
+              {aboutLink.label}
+            </Link>
+          </li>
           <li>
             {user ? (
               <AccountMenu user={user} onNavigate={closePanel} />

@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { PostCard, cardVariants } from "@/components/post-card";
-import { posts } from "@/lib/posts";
+import type { Post } from "@/lib/posts";
 
 const containerVariants = {
   hidden: {},
@@ -11,8 +11,16 @@ const containerVariants = {
   },
 };
 
-export function GalleryGrid() {
+export function GalleryGrid({ posts }: { posts: Post[] }) {
   const shouldReduceMotion = useReducedMotion();
+
+  if (posts.length === 0) {
+    return (
+      <p className="border-brutal bg-canvas px-4 py-6 font-mono text-sm shadow-brutal-sm">
+        No posts in this category yet.
+      </p>
+    );
+  }
 
   return (
     <motion.div
