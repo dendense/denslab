@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { GalleryGrid } from "@/components/gallery-grid";
-import { CATEGORIES, CATEGORY_SLUGS, postsByCategory } from "@/lib/posts";
+import { CATEGORIES, CATEGORY_SLUGS } from "@/lib/posts";
+import { fetchPosts } from "@/lib/posts-repository";
 
 export const metadata: Metadata = {
   title: "Categories",
@@ -22,7 +23,9 @@ export default async function CategoryPage({
 
   if (!category) notFound();
 
-  const categoryPosts = postsByCategory(category);
+  const categoryPosts = (await fetchPosts()).filter(
+    (post) => post.category === category,
+  );
 
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">

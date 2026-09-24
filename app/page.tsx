@@ -1,7 +1,9 @@
 import { GalleryGrid } from "@/components/gallery-grid";
-import { posts } from "@/lib/posts";
+import { fetchPosts } from "@/lib/posts-repository";
 
-export default function Home() {
+export default async function Home() {
+  const posts = await fetchPosts();
+
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-14 lg:px-10">
       <header className="mb-8 max-w-2xl sm:mb-10">
@@ -9,8 +11,8 @@ export default function Home() {
           Visual stories from the edge of reality &amp; imagination.
         </h1>
         <p className="mt-3 font-mono text-xs leading-relaxed sm:mt-4 sm:text-sm">
-          Placeholder entries for layout work. Real posts will come from
-          Supabase.
+          AI-generated work and photographs, with the prompt or the camera
+          settings behind each one.
         </p>
       </header>
 

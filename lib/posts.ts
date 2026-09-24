@@ -294,10 +294,17 @@ const rawPosts: (Omit<AiPost, "orientation"> | Omit<PhotoPost, "orientation">)[]
   },
 ];
 
-export const posts: Post[] = rawPosts.map((post) => ({
+/**
+ * Local dataset used for the demo build and as a fallback while the Supabase
+ * `posts` table is being set up. Live reads go through lib/posts-repository.ts.
+ */
+export const demoPosts: Post[] = rawPosts.map((post) => ({
   ...post,
   orientation: orientationOf(post.width, post.height),
 }));
+
+/** @deprecated Use fetchPosts() from lib/posts-repository for live data. */
+export const posts = demoPosts;
 
 /** Posts filtered by aspect orientation, for future curation features. */
 export function postsByOrientation(orientation: PostOrientation) {

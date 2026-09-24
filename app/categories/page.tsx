@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { CATEGORIES, CATEGORY_SLUGS, postsByCategory } from "@/lib/posts";
+import { CATEGORIES, CATEGORY_SLUGS } from "@/lib/posts";
+import { fetchPosts } from "@/lib/posts-repository";
 
 export const metadata: Metadata = {
   title: "Categories",
   description: "Browse denslab posts by category.",
 };
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
+  const posts = await fetchPosts();
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
       <header className="mb-8 max-w-2xl sm:mb-10">
@@ -36,7 +38,7 @@ export default function CategoriesPage() {
 
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:gap-6">
         {CATEGORIES.map((category) => {
-          const count = postsByCategory(category).length;
+          const count = posts.filter((post) => post.category === category).length;
 
           return (
             <li key={category}>

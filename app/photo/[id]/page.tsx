@@ -5,25 +5,24 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { PromptPanel } from "@/components/prompt-panel";
 import { Badge } from "@/components/ui/badge";
-import { getPostById, imgurFullUrl, posts } from "@/lib/posts";
+import { imgurFullUrl } from "@/lib/posts";
+import { fetchPostById } from "@/lib/posts-repository";
 import { createClient } from "@/lib/supabase/server";
 
 /**
  * The prompt panel depends on the request session, so this route must render
  * per request. Without this, Next prerenders the guest (locked) variant once
  * and serves it to signed-in users too.
+ *
+ * Post ids are database UUIDs, so there is no static param list to enumerate.
  */
 export const dynamic = "force-dynamic";
-
-export function generateStaticParams() {
-  return posts.map((post) => ({ id: post.id }));
-}
 
 export async function generateMetadata({
   params,
 }: PageProps<"/photo/[id]">): Promise<Metadata> {
   const { id } = await params;
-  const post = getPostById(id);
+  const post = await fetchPostById(id);
 
   if (!post) return { title: "Photo not found" };
 
@@ -53,7 +52,7 @@ export default async function PhotoDetailPage({
   params,
 }: PageProps<"/photo/[id]">) {
   const { id } = await params;
-  const post = getPostById(id);
+  const post = await fetchPostById(id);
 
   if (!post) notFound();
 
