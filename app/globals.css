@@ -129,6 +129,18 @@
   }
 }
 
+/*
+ * Stand-in for a post image that cannot be shown. The diagonal hatch marks it
+ * as deliberately empty rather than broken, using only palette colours.
+ */
+@utility brutal-placeholder {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--edge) 12%, transparent) 0 8px,
+    transparent 8px 16px
+  );
+}
+
 @layer base {
   html {
     /* Native form controls, scrollbars, and the tab ring follow the theme. */

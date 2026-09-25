@@ -2,12 +2,11 @@
 
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { PostImage } from "@/components/post-image";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { imgurThumbUrl } from "@/lib/posts";
 import type { PostCardData } from "@/lib/posts-repository";
 
 export const cardVariants: Variants = {
@@ -41,21 +40,21 @@ export function PostCard({
     >
       <Link href={`/photo/${post.id}`} className="block">
         <div className="relative">
-          {!loaded && <Skeleton className="h-full w-full" />}
+          {/* The skeleton covers the image while it loads, then is removed. */}
+          {!loaded && (
+            <Skeleton className="absolute inset-0 h-full w-full" />
+          )}
 
-          <Image
-            src={imgurThumbUrl(post.imgurId)}
+          <PostImage
+            imgurId={post.imgurId}
             alt={post.title}
             width={post.width}
             height={post.height}
             sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             quality={85}
-            loading={priority ? "eager" : "lazy"}
-            fetchPriority={priority ? "high" : "auto"}
-            onLoad={() => setLoaded(true)}
-            className={`w-full border-b-brutal object-cover transition-opacity duration-300 ${
-              loaded ? "opacity-100" : "absolute inset-0 h-0 opacity-0"
-            }`}
+            priority={priority}
+            onSettled={() => setLoaded(true)}
+            className="w-full border-b-brutal object-cover"
           />
 
           {/*

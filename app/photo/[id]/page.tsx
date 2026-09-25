@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { PromptPanel } from "@/components/prompt-panel";
 import { BookmarkButton } from "@/components/bookmark-button";
 import { DonateButton } from "@/components/donate-button";
+import { PostImage } from "@/components/post-image";
 import { Badge } from "@/components/ui/badge";
 import { isBookmarked } from "@/lib/bookmarks";
-import { imgurFullUrl } from "@/lib/posts";
 import { fetchPostById } from "@/lib/posts-repository";
 import { createClient } from "@/lib/supabase/server";
 
@@ -75,12 +74,14 @@ export default async function PhotoDetailPage({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
         <div className="lg:col-span-2">
           <figure className="border-brutal bg-canvas shadow-brutal">
-            <Image
-              src={imgurFullUrl(post.imgurId)}
+            <PostImage
+              imgurId={post.imgurId}
               alt={post.title}
               width={post.width}
               height={post.height}
               sizes="(min-width: 1024px) 66vw, 100vw"
+              fullSize
+              priority
               className="h-auto w-full object-contain"
             />
           </figure>
