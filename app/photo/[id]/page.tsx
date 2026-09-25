@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { PromptPanel } from "@/components/prompt-panel";
 import { BookmarkButton } from "@/components/bookmark-button";
+import { DonateButton } from "@/components/donate-button";
 import { Badge } from "@/components/ui/badge";
 import { isBookmarked } from "@/lib/bookmarks";
 import { imgurFullUrl } from "@/lib/posts";
@@ -106,12 +107,13 @@ export default async function PhotoDetailPage({
               ))}
             </ul>
 
-            <div className="pt-2">
+            <div className="flex flex-wrap gap-2 pt-2">
               <BookmarkButton
                 postId={post.id}
                 initialBookmarked={bookmarked}
                 isAuthenticated={authenticated}
               />
+              <DonateButton />
             </div>
 
             <dl className="grid grid-cols-2 gap-2 border-t-brutal-thin pt-4 font-mono text-xs">
