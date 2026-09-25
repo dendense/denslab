@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, ShieldCheck, X } from "lucide-react";
+import { Bookmark, Menu, ShieldCheck, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -172,6 +172,20 @@ export function SiteHeader() {
               {aboutLink.label}
             </Link>
           </li>
+          {user && (
+            <li>
+              <Link
+                href="/bookmarks"
+                aria-current={pathname === "/bookmarks" ? "page" : undefined}
+                className={`border-brutal-thin flex items-center gap-1.5 px-4 py-1.5 font-display text-base font-bold brutal-press ${
+                  pathname === "/bookmarks" ? "bg-accent text-on-accent" : ""
+                }`}
+              >
+                <Bookmark className="h-4 w-4" aria-hidden="true" />
+                Saved
+              </Link>
+            </li>
+          )}
           {user?.isAdmin && (
             <li>
               <Link
@@ -258,6 +272,21 @@ export function SiteHeader() {
               {aboutLink.label}
             </Link>
           </li>
+          {user && (
+            <li>
+              <Link
+                href="/bookmarks"
+                onClick={closePanel}
+                aria-current={pathname === "/bookmarks" ? "page" : undefined}
+                className={`border-brutal-thin flex w-full items-center gap-2 px-4 py-2.5 font-display text-base font-bold brutal-press ${
+                  pathname === "/bookmarks" ? "bg-accent text-on-accent" : ""
+                }`}
+              >
+                <Bookmark className="h-4 w-4" aria-hidden="true" />
+                Saved
+              </Link>
+            </li>
+          )}
           {user?.isAdmin && (
             <li>
               <Link

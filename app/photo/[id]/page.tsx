@@ -4,7 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { PromptPanel } from "@/components/prompt-panel";
+import { BookmarkButton } from "@/components/bookmark-button";
 import { Badge } from "@/components/ui/badge";
+import { isBookmarked } from "@/lib/bookmarks";
 import { imgurFullUrl } from "@/lib/posts";
 import { fetchPostById } from "@/lib/posts-repository";
 import { createClient } from "@/lib/supabase/server";
@@ -57,6 +59,7 @@ export default async function PhotoDetailPage({
   if (!post) notFound();
 
   const authenticated = await hasSession();
+  const bookmarked = authenticated ? await isBookmarked(post.id) : false;
 
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
@@ -102,6 +105,14 @@ export default async function PhotoDetailPage({
                 </li>
               ))}
             </ul>
+
+            <div className="pt-2">
+              <BookmarkButton
+                postId={post.id}
+                initialBookmarked={bookmarked}
+                isAuthenticated={authenticated}
+              />
+            </div>
 
             <dl className="grid grid-cols-2 gap-2 border-t-brutal-thin pt-4 font-mono text-xs">
               <div>

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Bookmark, Sparkles } from "lucide-react";
 import { ComingSoonCard } from "@/components/settings/coming-soon-card";
 import { UsernameForm } from "@/components/settings/username-form";
+import { countBookmarks } from "@/lib/bookmarks";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -39,6 +41,8 @@ export default async function SettingsPage() {
 
   if (!user) redirect("/login");
 
+  const bookmarkCount = await countBookmarks();
+
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
       <div className="mx-auto w-full max-w-3xl space-y-6 sm:space-y-8">
@@ -72,11 +76,34 @@ export default async function SettingsPage() {
             description="Support the laboratory and unlock early access to new collections and higher-resolution downloads."
           />
 
-          <ComingSoonCard
-            icon={Bookmark}
-            title="Bookmarks"
-            description="Save posts to a private collection so the prompts and references you like are easy to find again."
-          />
+          <section className="border-brutal-thin bg-canvas p-4 sm:p-5">
+            <div className="flex items-start gap-3">
+              <span
+                aria-hidden="true"
+                className="flex h-9 w-9 shrink-0 items-center justify-center border-brutal-thin bg-canvas"
+              >
+                <Bookmark className="h-4 w-4" />
+              </span>
+
+              <div className="min-w-0 space-y-1.5">
+                <h3 className="font-display text-base font-bold sm:text-lg">
+                  Bookmarks
+                </h3>
+                <p className="font-mono text-xs leading-relaxed">
+                  {bookmarkCount === 0
+                    ? "You have not saved any posts yet."
+                    : `${bookmarkCount} ${bookmarkCount === 1 ? "post" : "posts"} saved privately.`}
+                </p>
+
+                <Link
+                  href="/bookmarks"
+                  className="border-brutal-thin mt-2 inline-flex items-center gap-1.5 bg-accent px-3 py-1.5 font-display text-xs font-bold text-on-accent shadow-brutal-sm brutal-press sm:text-sm"
+                >
+                  Open bookmarks
+                </Link>
+              </div>
+            </div>
+          </section>
         </section>
       </div>
     </main>
