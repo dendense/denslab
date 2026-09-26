@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { checkImgurImages, isImgurImageAvailable } from "@/lib/imgur-check";
 import { createPublicClient } from "@/lib/supabase/public";
 import {
   type AiPost,
@@ -33,6 +34,11 @@ export type PostCardData = {
   orientation: Orientation;
   category: PostCategory;
   tags: string[];
+  /**
+   * Whether the Imgur id resolves, decided on the server. The browser cannot
+   * determine this, so the card must not try to guess.
+   */
+  imageAvailable: boolean;
 };
 
 type CardRow = {
@@ -79,7 +85,24 @@ function toCard(row: CardRow): PostCardData {
     orientation: orientationOf(row.width, row.height),
     category: row.category,
     tags: row.tags ?? [],
+    // Replaced below once the Imgur verdict is known.
+    imageAvailable: true,
   };
+}
+
+/**
+ * Maps rows to cards, attaching the server-side Imgur verdict in one batch so a
+ * gallery does not probe Imgur row by row.
+ */
+async function toCardsWithAvailability(
+  rows: CardRow[],
+): Promise<PostCardData[]> {
+  const availability = await checkImgurImages(rows.map((row) => row.imgur_id));
+
+  return rows.map((row) => ({
+    ...toCard(row),
+    imageAvailable: availability[row.imgur_id] ?? true,
+  }));
 }
 
 /** Local fallback uses the demo dataset until the table is seeded. */
@@ -94,6 +117,8 @@ function demoCards(): PostCardData[] {
     orientation: post.orientation,
     category: post.category,
     tags: post.tags,
+    // Demo ids may not resolve; the client's onError catches any that do not.
+    imageAvailable: true,
   }));
 }
 
@@ -204,7 +229,7 @@ async function readPostPage(
   }
 
   return {
-    posts: (data as CardRow[]).map(toCard),
+    posts: await toCardsWithAvailability(data as CardRow[]),
     total,
     page,
     pageCount: Math.max(1, Math.ceil(total / POSTS_PER_PAGE)),
@@ -344,6 +369,15 @@ export async function fetchPostById(id: string): Promise<Post | undefined> {
 }
 
 /**
+ * Whether a post's image resolves. Kept out of `fetchPostById` so the cached
+ * post payload does not carry a UI concern, and so the detail page can pass the
+ * verdict straight to the image component.
+ */
+export async function isPostImageAvailable(imgurId: string): Promise<boolean> {
+  return isImgurImageAvailable(imgurId);
+}
+
+/**
  * Uncached per-id read, for the admin edit form where a stale cache entry would
  * mean editing outdated values right after a save.
  */
@@ -369,7 +403,7 @@ export async function fetchAllCards(): Promise<PostCardData[]> {
 
   if (error || !data) return demoCards();
 
-  const cards = (data as CardRow[]).map(toCard);
+  const cards = await toCardsWithAvailability(data as CardRow[]);
   return cards.length > 0 ? cards : demoCards();
 }
 

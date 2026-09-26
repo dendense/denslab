@@ -40,8 +40,11 @@ export function PostCard({
     >
       <Link href={`/photo/${post.id}`} className="block">
         <div className="relative">
-          {/* The skeleton covers the image while it loads, then is removed. */}
-          {!loaded && (
+          {/*
+            The skeleton only makes sense while a real image is loading. When the
+            post has no usable image the placeholder renders immediately.
+          */}
+          {post.imageAvailable && !loaded && (
             <Skeleton className="absolute inset-0 h-full w-full" />
           )}
 
@@ -53,6 +56,7 @@ export function PostCard({
             sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             quality={85}
             priority={priority}
+            imageAvailable={post.imageAvailable}
             onSettled={() => setLoaded(true)}
             className="w-full border-b-brutal object-cover"
           />

@@ -8,7 +8,10 @@ import { DonateButton } from "@/components/donate-button";
 import { PostImage } from "@/components/post-image";
 import { Badge } from "@/components/ui/badge";
 import { isBookmarked } from "@/lib/bookmarks";
-import { fetchPostById } from "@/lib/posts-repository";
+import {
+  fetchPostById,
+  isPostImageAvailable,
+} from "@/lib/posts-repository";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -60,6 +63,7 @@ export default async function PhotoDetailPage({
 
   const authenticated = await hasSession();
   const bookmarked = authenticated ? await isBookmarked(post.id) : false;
+  const imageAvailable = await isPostImageAvailable(post.imgurId);
 
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
@@ -82,6 +86,7 @@ export default async function PhotoDetailPage({
               sizes="(min-width: 1024px) 66vw, 100vw"
               fullSize
               priority
+              imageAvailable={imageAvailable}
               className="h-auto w-full object-contain"
             />
           </figure>

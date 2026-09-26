@@ -1,3 +1,4 @@
+import { checkImgurImages } from "@/lib/imgur-check";
 import { createClient } from "@/lib/supabase/server";
 import type { PostCardData } from "@/lib/posts-repository";
 
@@ -75,20 +76,28 @@ export async function fetchBookmarkedPosts(): Promise<PostCardData[]> {
 
   if (error || !data) return [];
 
-  return (data as unknown as BookmarkRow[])
+  const rows = (data as unknown as BookmarkRow[])
     .map((row) => row.posts)
-    .filter((post): post is NonNullable<BookmarkRow["posts"]> => post !== null)
-    .map((post) => ({
-      id: post.id,
-      title: post.title,
-      description: post.description,
-      imgurId: post.imgur_id,
-      width: post.width,
-      height: post.height,
-      orientation: orientationOf(post.width, post.height),
-      category: post.category,
-      tags: post.tags ?? [],
-    }));
+    .filter((post): post is NonNullable<BookmarkRow["posts"]> => post !== null);
+
+  // One batch check for every saved post, so cards know whether to show an image
+  // or the placeholder without probing Imgur from the browser.
+  const availability = await checkImgurImages(
+    rows.map((post) => post.imgur_id),
+  );
+
+  return rows.map((post) => ({
+    id: post.id,
+    title: post.title,
+    description: post.description,
+    imgurId: post.imgur_id,
+    width: post.width,
+    height: post.height,
+    orientation: orientationOf(post.width, post.height),
+    category: post.category,
+    tags: post.tags ?? [],
+    imageAvailable: availability[post.imgur_id] ?? true,
+  }));
 }
 
 /** How many posts the signed-in user has bookmarked. */

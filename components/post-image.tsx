@@ -8,15 +8,13 @@ import { imgurFullUrl, imgurThumbUrl } from "@/lib/posts";
 /**
  * Post image with a Neobrutalist fallback.
  *
- * A post can point at an Imgur id that no longer resolves — Imgur then serves
- * its own "removed" placeholder, which looks like a broken third-party asset
- * rather than part of the design. This component detects that case and swaps in
- * a branded placeholder instead.
+ * Whether the Imgur id is valid is decided on the server and passed in as
+ * `imageAvailable`. It cannot be decided here: Imgur sends no CORS headers, the
+ * optimizer hides the upstream URL, and the served dimensions depend on viewport
+ * width, so a small mobile variant of a real photo is indistinguishable from
+ * Imgur's `removed.png` by size alone.
  *
- * Two failure modes are handled:
- * 1. The image fails to load at all (`onError`).
- * 2. The image loads but is Imgur's tiny `removed.png` fallback, detected by its
- *    known dimensions. A load event alone cannot tell these apart.
+ * `onError` stays as a second line of defence for network failures after load.
  */
 export function PostImage({
   imgurId,
@@ -28,8 +26,8 @@ export function PostImage({
   priority = false,
   className = "",
   onSettled,
-  /** Detail page uses the full-resolution Imgur file instead of a thumbnail. */
   fullSize = false,
+  imageAvailable,
 }: {
   imgurId: string;
   alt: string;
@@ -39,16 +37,16 @@ export function PostImage({
   quality?: number;
   priority?: boolean;
   className?: string;
-  /**
-   * Called once the image has either loaded or definitively failed, so the
-   * caller can drop its loading skeleton either way.
-   */
+  /** Called once the image is shown or replaced, so a skeleton can be cleared. */
   onSettled?: () => void;
+  /** Detail page uses the full-resolution Imgur file instead of a thumbnail. */
   fullSize?: boolean;
+  /** Server-side verdict on whether the Imgur id resolves. */
+  imageAvailable: boolean;
 }) {
   const [failed, setFailed] = useState(false);
 
-  if (failed || !imgurId) {
+  if (!imageAvailable || failed || !imgurId) {
     return (
       <Placeholder
         alt={alt}
@@ -57,11 +55,6 @@ export function PostImage({
         className={className}
       />
     );
-  }
-
-  function markFailed() {
-    setFailed(true);
-    onSettled?.();
   }
 
   return (
@@ -74,15 +67,9 @@ export function PostImage({
       quality={quality}
       loading={priority ? "eager" : "lazy"}
       fetchPriority={priority ? "high" : "auto"}
-      onError={markFailed}
-      onLoad={(event) => {
-        // Imgur's removed.png is 161x81. A real photo is never that small, so a
-        // successful load event alone cannot be trusted here.
-        const img = event.currentTarget;
-        if (img.naturalWidth <= 200 && img.naturalHeight <= 200) {
-          markFailed();
-          return;
-        }
+      onLoad={() => onSettled?.()}
+      onError={() => {
+        setFailed(true);
         onSettled?.();
       }}
       className={className}
