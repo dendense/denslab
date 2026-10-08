@@ -39,7 +39,7 @@ export default function AboutPage() {
 
         <figure className="border-brutal bg-canvas shadow-brutal">
           <Image
-            src={imgurFullUrl(aboutImage.imgurId)}
+            src="https://i.imgur.com/syCkh06.jpeg"
             alt={aboutImage.title}
             width={aboutImage.width}
             height={aboutImage.height}
@@ -47,10 +47,7 @@ export default function AboutPage() {
             className="h-auto w-full border-b-brutal object-cover"
           />
           <figcaption className="px-4 py-3 font-mono text-xs sm:text-sm">
-            {aboutImage.title}
-            <span className="ml-2 uppercase tracking-wide">
-              — conceptual photo
-            </span>
+            Art by @bloodexer - SMRRY
           </figcaption>
         </figure>
       </article>
