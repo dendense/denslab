@@ -1,6 +1,6 @@
 "use client";
 
-import { Bookmark, Menu, ShieldCheck, Wallet, X } from "lucide-react";
+import { Bookmark, Menu, ShieldCheck, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -9,8 +9,6 @@ import { createClient } from "@/lib/supabase/client";
 import { shortenUsername } from "@/lib/format-username";
 
 const aboutLink = { href: "/about", label: "About" };
-
-const financeLink = { href: "http://localhost:8791/", label: "Finance" };
 
 /** One nav entry for browsing; the picker lives on the category page itself. */
 const categoryLink = { href: "/categories", label: "Category" };
@@ -203,21 +201,6 @@ export function SiteHeader() {
             </li>
           )}
           <li>
-            <Link
-              href={financeLink.href}
-              aria-label={financeLink.label}
-              aria-current={pathname.startsWith(financeLink.href) ? "page" : undefined}
-              className={`border-brutal-thin flex items-center gap-1.5 px-4 py-1.5 font-display text-base font-bold brutal-press ${
-                pathname.startsWith(financeLink.href)
-                  ? "bg-accent text-on-accent"
-                  : ""
-              }`}
-            >
-              <Wallet className="h-4 w-4" aria-hidden="true" />
-              {financeLink.label}
-            </Link>
-          </li>
-          <li>
             {user ? (
               <AccountMenu user={user} onNavigate={closePanel} />
             ) : (
@@ -319,22 +302,6 @@ export function SiteHeader() {
               </Link>
             </li>
           )}
-          <li>
-            <Link
-              href={financeLink.href}
-              onClick={closePanel}
-              aria-label={financeLink.label}
-              aria-current={pathname.startsWith(financeLink.href) ? "page" : undefined}
-              className={`border-brutal-thin flex w-full items-center gap-2 px-4 py-2.5 font-display text-base font-bold brutal-press ${
-                pathname.startsWith(financeLink.href)
-                  ? "bg-accent text-on-accent"
-                  : ""
-              }`}
-            >
-              <Wallet className="h-4 w-4" aria-hidden="true" />
-              {financeLink.label}
-            </Link>
-          </li>
           <li>
             {user ? (
               <AccountMenu user={user} onNavigate={closePanel} />
