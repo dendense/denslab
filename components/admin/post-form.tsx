@@ -28,7 +28,7 @@ function initialCategory(post?: Post): Category {
 }
 
 const inputClass =
-  "border-brutal-thin w-full bg-canvas px-3 py-2 font-mono text-sm outline-none focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "border-brutal-thin w-full bg-canvas px-3 py-2 font-mono text-sm";
 
 const labelClass =
   "mb-1 block font-mono text-[10px] font-bold uppercase tracking-wide";

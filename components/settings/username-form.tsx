@@ -68,7 +68,7 @@ export function UsernameForm({ initialName }: { initialName: string }) {
         }}
         autoComplete="nickname"
         maxLength={40}
-        className="border-brutal w-full bg-canvas px-3 py-2 font-display text-sm font-bold outline-none focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-accent sm:text-base"
+        className="border-brutal w-full bg-canvas px-3 py-2 font-display text-sm font-bold sm:text-base"
       />
 
       <p className="font-mono text-[11px] leading-relaxed">

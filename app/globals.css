@@ -23,7 +23,13 @@
   --accent: #ffde59;
   --ink: #fffdf8;
   --on-accent: #000000;
-  --edge: #000000;
+  /*
+   * Was #000000. Black on the dark canvas is 1.19:1, so every border and hard
+   * shadow disappeared and cards had no outline at all. zinc-500 is the nearest
+   * neutral that clears 3:1 on both surfaces it is drawn against: 3.67:1 on
+   * `--canvas` and 3.65:1 on `--accent`.
+   */
+  --edge: #71717a;
   --foreground: #fffdf8;
 }
 
@@ -97,9 +103,35 @@
   }
 }
 
+/*
+ * Reduced motion. The two utilities below move by design (the skeleton slides,
+ * the press shadow collapses with a 3px nudge), and Tailwind's own `animate-spin`
+ * is used for every pending spinner, so a blanket rule is the only way to catch
+ * all of them plus anything added later. It is unlayered on purpose: unlayered
+ * declarations outrank `@layer utilities`, which is what lets it win over the
+ * utilities without an `!important` arms race.
+ */
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .brutal-skeleton {
+    animation: none;
+  }
+
   .brutal-fade {
     transition: none;
+  }
+
+  /* Keep the shadow collapse as static feedback, drop the movement. */
+  .brutal-press:hover {
+    transform: none;
   }
 }
 
@@ -120,12 +152,6 @@
   }
   to {
     background-position: -200% 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .brutal-skeleton {
-    animation: none;
   }
 }
 
@@ -162,9 +188,28 @@
     color: var(--on-accent);
   }
 
-  /* Focus ring stays visible in both themes. */
+  /*
+   * Tailwind v4's preflight no longer gives buttons `cursor: pointer` (it
+   * inherits the browser default, `cursor: default`), so every button in the
+   * project read as inert. One rule here covers all of them and anything added
+   * later; `:where()` keeps specificity at zero so the `disabled:cursor-not-allowed`
+   * utilities still win for disabled buttons.
+   */
+  :where(button, [role="button"]):not(:disabled) {
+    cursor: pointer;
+  }
+
+  /*
+   * Focus ring stays visible in both themes. The ring is drawn outside the
+   * element (offset 2px), so it sits on `--canvas` and has to clear 3:1
+   * against that surface. `--ink` does in both: #000000 on the light canvas
+   * is 20.66:1, #fffdf8 on the dark canvas is 17.43:1. The accent cannot be
+   * the light-mode ring — it is only 1.30:1 there — which is why the
+   * per-element `focus-visible:outline-accent` utilities were replaced with
+   * `outline-ink`, the convention theme-toggle.tsx already used.
+   */
   :focus-visible {
-    outline: 3px solid var(--accent);
+    outline: 3px solid var(--ink);
     outline-offset: 2px;
   }
 }

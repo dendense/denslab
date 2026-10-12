@@ -37,7 +37,7 @@ export function SearchBox({
           placeholder="Search title, description, or tag"
           aria-label="Search posts"
           maxLength={80}
-          className="border-brutal-thin h-11 w-full bg-canvas pl-9 pr-3 font-mono text-sm outline-none focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="border-brutal-thin h-11 w-full bg-canvas pl-9 pr-3 font-mono text-sm"
         />
       </div>
 
