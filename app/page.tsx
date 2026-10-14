@@ -20,12 +20,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   const preserved = search ? new URLSearchParams({ q: search }).toString() : "";
 
   return (
-    /*
-     * `.theme-obsidian` scopes the premium/animated theme to this page only.
-     * Other routes have no wrapper, so they keep the Neobrutalist theme; no
-     * shared component markup was changed to achieve the scoping.
-     */
-    <main className="theme-obsidian w-full flex-1 px-4 py-8 sm:px-6 sm:py-14 lg:px-10">
+    <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-14 lg:px-10">
       <header className="mb-8 max-w-2xl sm:mb-10">
         <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
           Visual stories from the edge of reality &amp; imagination.

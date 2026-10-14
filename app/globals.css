@@ -6,35 +6,49 @@
 
 :root,
 [data-theme="light"] {
-  --canvas: #fffdf8;
-  --accent: #ffde59;
-  /* Text/icon color, inverted in dark mode. */
-  --ink: #000000;
-  /* Text on top of `--accent`. Always black: the accent is light in both modes. */
-  --on-accent: #000000;
-  /* Structural color for borders and hard shadows, stays black in both modes. */
-  --edge: #000000;
+  /* Premium light palette — dark canvas + neutral surface + single blue accent. */
+  --canvas: #fafafa;
+  --surface: #ffffff;
   --foreground: #09090b;
+  --accent: #2563eb;
+  --on-accent: #ffffff;
+  --ink: #09090b;
+  --muted: #52525b;
+  /* Structural edge. zinc-500 clears 4.63:1 on #fafafa and 4.75:1 on #fffdf8,
+     so borders remain visible without becoming heavy. */
+  --edge: #71717a;
+
+  /* Discover Button tokens (kept under the obsidian prefix for compatibility
+     with components/block/discover-button.css). */
+  --obsidian-discover-surface: rgb(255 255 255 / 92%);
+  --obsidian-discover-text: #09090b;
+  --obsidian-discover-fill: #18181b;
+  --obsidian-discover-active-text: #ffffff;
+  --obsidian-discover-border: #71717a;
 }
 
 [data-theme="dark"] {
-  /* Inverted light mode: canvas and ink swap roles. */
-  --canvas: #18181b;
-  --accent: #ffde59;
-  --ink: #fffdf8;
-  --on-accent: #000000;
-  /*
-   * Was #000000. Black on the dark canvas is 1.19:1, so every border and hard
-   * shadow disappeared and cards had no outline at all. zinc-500 is the nearest
-   * neutral that clears 3:1 on both surfaces it is drawn against: 3.67:1 on
-   * `--canvas` and 3.65:1 on `--accent`.
-   */
+  /* Premium dark palette — near-black canvas + zinc surface + brighter blue. */
+  --canvas: #09090b;
+  --surface: #18181b;
+  --foreground: #fafafa;
+  --accent: #3b82f6;
+  /* Dark-on-blue: #0b1220 on #3b82f6 is 5.09:1. */
+  --on-accent: #0b1220;
+  --ink: #fafafa;
+  --muted: #a1a1aa;
+  /* Same structural edge: 4.12:1 on the card surface #09090b. */
   --edge: #71717a;
-  --foreground: #fffdf8;
+
+  --obsidian-discover-surface: rgb(24 24 27 / 85%);
+  --obsidian-discover-text: #fafafa;
+  --obsidian-discover-fill: #3b82f6;
+  --obsidian-discover-active-text: #0b1220;
+  --obsidian-discover-border: #71717a;
 }
 
 @theme inline {
-  /* Neobrutalism 3-color palette (+ structural and on-accent tokens) */
+  /* Denslab palette exposed to Tailwind utilities. */
   --color-canvas: var(--canvas);
   --color-ink: var(--ink);
   --color-on-accent: var(--on-accent);
@@ -47,107 +61,38 @@
   --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 
-  /* Hard shadows, no blur */
-  --shadow-brutal-sm: 4px 4px 0 0 var(--edge);
-  --shadow-brutal: 5px 5px 0 0 var(--edge);
-  --shadow-brutal-lg: 6px 6px 0 0 var(--edge);
-  --shadow-brutal-press: 2px 2px 0 0 var(--edge);
+  /* Layered soft shadows replace the hard offset ones everywhere. */
+  --shadow-brutal-sm: 0 1px 2px rgb(9 9 11 / 6%), 0 8px 24px -10px rgb(9 9 11 / 18%);
+  --shadow-brutal: 0 2px 4px rgb(9 9 11 / 8%), 0 18px 40px -12px rgb(9 9 11 / 28%);
+  --shadow-brutal-lg: 0 4px 8px rgb(9 9 11 / 10%), 0 28px 60px -16px rgb(9 9 11 / 30%);
+  --shadow-brutal-press: 0 1px 2px rgb(9 9 11 / 6%), 0 6px 16px -8px rgb(9 9 11 / 22%);
+  --shadow-brutal-hover: 0 2px 4px rgb(9 9 11 / 8%), 0 18px 40px -12px rgb(9 9 11 / 28%);
 
-  /* Neobrutalism keeps corners square */
-  --radius-brutal: 0px;
+  /* Premium radius (was 0px in the Neobrutalist phase). */
+  --radius-brutal: 12px;
 }
 
-/*
- * ---------------------------------------------------------------------------
- * Scoped "ObsidianUI" theme — PREMIUM / ANIMATED direction.
- *
- * Phase 1: applied to the home page ONLY, via a `.theme-obsidian` wrapper on
- * its <main>. Every other page keeps the Neobrutalist theme untouched, because
- * they have no wrapper (no shared component markup was edited to achieve this).
- *
- * How it works: denslab's palette is exposed to Tailwind through
- * `@theme inline`, so utilities compile to `var(--canvas)`, `var(--accent)`,
- * `var(--edge)`, … read from the element itself. Re-declaring those four tokens
- * inside `.theme-obsidian` therefore re-themes every existing utility class in
- * the subtree without touching a single component file.
- *
- * Visual language imitated from ObsidianUI (palette, soft radius, layered
- * shadows) — style only, no code copied. The one component adapted from it is
- * the Discover Button (see NOTICE-obsidianui.md).
- * ---------------------------------------------------------------------------
- */
-.theme-obsidian {
-  /* Light-mode premium palette (neutral surface + a single blue accent). */
-  --obsidian-canvas: #fafafa;
-  --obsidian-surface: #ffffff;
-  --obsidian-fg: #09090b;
-  --obsidian-accent: #2563eb;
-  --obsidian-on-accent: #ffffff;
-  /*
-   * Structural edge. Must clear 3:1 against the surfaces it is drawn on
-   * (WCAG 1.4.11), and the border is the only card boundary once the hard
-   * shadow is replaced by a soft one. zinc-500 is the same neutral the base
-   * dark theme uses: 4.63:1 on the card surface #fafafa, 4.75:1 on the page
-   * #fffdf8. (#e4e4e7 was 1.22:1 — cards had no visible outline.)
-   */
-  --obsidian-edge: #71717a;
-  --obsidian-radius: 12px;
-  /* Layered soft shadows replace the hard offset ones. */
-  --obsidian-shadow-sm: 0 1px 2px rgb(9 9 11 / 6%), 0 8px 24px -10px rgb(9 9 11 / 18%);
-  --obsidian-shadow-hover: 0 2px 4px rgb(9 9 11 / 8%), 0 18px 40px -12px rgb(9 9 11 / 28%);
-  /* Discover Button surfaces. */
-  --obsidian-discover-surface: rgb(255 255 255 / 92%);
-  --obsidian-discover-text: #09090b;
-  --obsidian-discover-fill: #18181b;
-  --obsidian-discover-active-text: #ffffff;
-  /* Pill outline must be visible on the page without hover: 4.63:1 on #fafafa. */
-  --obsidian-discover-border: #71717a;
-
-  /* Re-point denslab's palette tokens for this subtree only. */
-  --canvas: var(--obsidian-canvas);
-  --foreground: var(--obsidian-fg);
-  --accent: var(--obsidian-accent);
-  --on-accent: var(--obsidian-on-accent);
-  --edge: var(--obsidian-edge);
-  --ink: var(--obsidian-fg);
+/* Dark-mode shadow overrides so layered shadows stay dark on dark surfaces. */
+[data-theme="dark"] {
+  --shadow-brutal-sm: 0 1px 2px rgb(0 0 0 / 50%), 0 16px 40px -14px rgb(0 0 0 / 70%);
+  --shadow-brutal: 0 2px 4px rgb(0 0 0 / 55%), 0 24px 52px -16px rgb(0 0 0 / 80%);
+  --shadow-brutal-lg: 0 4px 8px rgb(0 0 0 / 60%), 0 32px 64px -18px rgb(0 0 0 / 85%);
+  --shadow-brutal-press: 0 1px 2px rgb(0 0 0 / 55%), 0 6px 16px -8px rgb(0 0 0 / 70%);
+  --shadow-brutal-hover: 0 2px 6px rgb(0 0 0 / 55%), 0 24px 52px -16px rgb(0 0 0 / 80%);
 }
 
-[data-theme="dark"] .theme-obsidian {
-  --obsidian-canvas: #09090b;
-  --obsidian-surface: #18181b;
-  --obsidian-fg: #fafafa;
-  --obsidian-accent: #3b82f6;
-  /* Dark-on-blue: #0b1220 on #3b82f6 is 5.09:1. */
-  --obsidian-on-accent: #0b1220;
-  /*
-   * Same structural edge as light mode: 4.12:1 on the card surface #09090b.
-   * (#3f3f46 was 1.91:1 — cards had no visible outline.)
-   */
-  --obsidian-edge: #71717a;
-  --obsidian-shadow-sm: 0 1px 2px rgb(0 0 0 / 50%), 0 16px 40px -14px rgb(0 0 0 / 70%);
-  --obsidian-shadow-hover: 0 2px 6px rgb(0 0 0 / 55%), 0 24px 52px -16px rgb(0 0 0 / 80%);
-  --obsidian-discover-surface: rgb(24 24 27 / 85%);
-  --obsidian-discover-text: #fafafa;
-  --obsidian-discover-fill: #3b82f6;
-  --obsidian-discover-active-text: #0b1220;
-  /* Visible against the blended pill surface (#161619) at 3.74:1. */
-  --obsidian-discover-border: #71717a;
+@utility border-brutal {
+  border-width: 3px;
+  border-style: solid;
+  border-color: var(--edge);
+  border-radius: var(--radius-brutal);
 }
 
-/*
- * Restyle the existing border/shadow utilities inside the scope: soft radii
- * and blurred shadows instead of square corners and hard offsets. The border
- * *widths* and every layout/spacing utility are left alone, so the page keeps
- * its exact structure.
- */
-.theme-obsidian .border-brutal {
-  border-color: var(--obsidian-edge);
-  border-radius: var(--obsidian-radius);
-}
-
-.theme-obsidian .border-brutal-thin {
-  border-color: var(--obsidian-edge);
-  border-radius: calc(var(--obsidian-radius) - 2px);
+@utility border-brutal-thin {
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--edge);
+  border-radius: calc(var(--radius-brutal) - 2px);
 }
 
 /*
@@ -158,54 +103,20 @@
  * sit on the accent (white on #2563eb = 5.17:1; #0b1220 on #3b82f6 = 5.09:1),
  * and it keeps the pill outline the same colour as its label.
  */
-.theme-obsidian .bg-accent.border-brutal,
-.theme-obsidian .bg-accent.border-brutal-thin {
+.bg-accent.border-brutal,
+.bg-accent.border-brutal-thin {
   border-color: var(--on-accent);
 }
 
-.theme-obsidian .shadow-brutal-sm {
-  box-shadow: var(--obsidian-shadow-sm);
-}
-
-.theme-obsidian .shadow-brutal,
-.theme-obsidian .shadow-brutal-lg {
-  box-shadow: var(--obsidian-shadow-hover);
-}
-
-/*
- * Premium hover: a subtle lift instead of the Neobrutalist shadow collapse.
- * Wrapped in `no-preference` so `prefers-reduced-motion` users keep the static
- * state (the global reduced-motion rule already disables the transition).
- */
-@media (prefers-reduced-motion: no-preference) {
-  .theme-obsidian .brutal-press:hover {
-    box-shadow: var(--obsidian-shadow-hover);
-    transform: translateY(-2px);
-  }
-}
-
-/* Tailwind v4 has no `--border-width-*` theme namespace, so borders are utilities. */
-@utility border-brutal {
-  border-width: 3px;
-  border-style: solid;
-  border-color: var(--edge);
-}
-
-@utility border-brutal-thin {
-  border-width: 2px;
-  border-style: solid;
-  border-color: var(--edge);
-}
-
-/* Hover/press interaction: the hard shadow collapses toward the element. */
+/* Premium hover: a subtle lift instead of the Neobrutalist shadow collapse. */
 @utility brutal-press {
   transition:
-    box-shadow 120ms ease-out,
-    transform 120ms ease-out;
+    box-shadow 160ms ease-out,
+    transform 160ms ease-out;
 
   &:hover {
-    box-shadow: 2px 2px 0 0 var(--edge);
-    transform: translate(3px, 3px);
+    box-shadow: var(--shadow-brutal-hover);
+    transform: translateY(-2px);
   }
 }
 
@@ -256,7 +167,7 @@
     transition: none;
   }
 
-  /* Keep the shadow collapse as static feedback, drop the movement. */
+  /* Keep the lift as static shadow feedback, drop the movement. */
   .brutal-press:hover {
     transform: none;
   }
@@ -310,6 +221,16 @@
     font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   }
 
+  /* Headings: tighter tracking for a premium editorial feel. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    letter-spacing: -0.02em;
+  }
+
   ::selection {
     background-color: var(--accent);
     color: var(--on-accent);
@@ -329,11 +250,8 @@
   /*
    * Focus ring stays visible in both themes. The ring is drawn outside the
    * element (offset 2px), so it sits on `--canvas` and has to clear 3:1
-   * against that surface. `--ink` does in both: #000000 on the light canvas
-   * is 20.66:1, #fffdf8 on the dark canvas is 17.43:1. The accent cannot be
-   * the light-mode ring — it is only 1.30:1 there — which is why the
-   * per-element `focus-visible:outline-accent` utilities were replaced with
-   * `outline-ink`, the convention theme-toggle.tsx already used.
+   * against that surface. `--ink` does in both: #09090b on the light canvas
+   * is 20.66:1, #fafafa on the dark canvas is 17.43:1.
    */
   :focus-visible {
     outline: 3px solid var(--ink);
