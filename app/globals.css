@@ -57,6 +57,105 @@
   --radius-brutal: 0px;
 }
 
+/*
+ * ---------------------------------------------------------------------------
+ * Scoped "ObsidianUI" theme — PREMIUM / ANIMATED direction.
+ *
+ * Phase 1: applied to the home page ONLY, via a `.theme-obsidian` wrapper on
+ * its <main>. Every other page keeps the Neobrutalist theme untouched, because
+ * they have no wrapper (no shared component markup was edited to achieve this).
+ *
+ * How it works: denslab's palette is exposed to Tailwind through
+ * `@theme inline`, so utilities compile to `var(--canvas)`, `var(--accent)`,
+ * `var(--edge)`, … read from the element itself. Re-declaring those four tokens
+ * inside `.theme-obsidian` therefore re-themes every existing utility class in
+ * the subtree without touching a single component file.
+ *
+ * Visual language imitated from ObsidianUI (palette, soft radius, layered
+ * shadows) — style only, no code copied. The one component adapted from it is
+ * the Discover Button (see NOTICE-obsidianui.md).
+ * ---------------------------------------------------------------------------
+ */
+.theme-obsidian {
+  /* Light-mode premium palette (neutral surface + a single blue accent). */
+  --obsidian-canvas: #fafafa;
+  --obsidian-surface: #ffffff;
+  --obsidian-fg: #09090b;
+  --obsidian-accent: #2563eb;
+  --obsidian-on-accent: #ffffff;
+  --obsidian-edge: #e4e4e7;
+  --obsidian-radius: 12px;
+  /* Layered soft shadows replace the hard offset ones. */
+  --obsidian-shadow-sm: 0 1px 2px rgb(9 9 11 / 6%), 0 8px 24px -10px rgb(9 9 11 / 18%);
+  --obsidian-shadow-hover: 0 2px 4px rgb(9 9 11 / 8%), 0 18px 40px -12px rgb(9 9 11 / 28%);
+  /* Discover Button surfaces. */
+  --obsidian-discover-surface: rgb(255 255 255 / 92%);
+  --obsidian-discover-text: #09090b;
+  --obsidian-discover-fill: #18181b;
+  --obsidian-discover-active-text: #ffffff;
+
+  /* Re-point denslab's palette tokens for this subtree only. */
+  --canvas: var(--obsidian-canvas);
+  --foreground: var(--obsidian-fg);
+  --accent: var(--obsidian-accent);
+  --on-accent: var(--obsidian-on-accent);
+  --edge: var(--obsidian-edge);
+  --ink: var(--obsidian-fg);
+}
+
+[data-theme="dark"] .theme-obsidian {
+  --obsidian-canvas: #09090b;
+  --obsidian-surface: #18181b;
+  --obsidian-fg: #fafafa;
+  --obsidian-accent: #3b82f6;
+  /* Dark-on-blue: #0b1220 on #3b82f6 is 5.09:1. */
+  --obsidian-on-accent: #0b1220;
+  --obsidian-edge: #3f3f46;
+  --obsidian-shadow-sm: 0 1px 2px rgb(0 0 0 / 50%), 0 16px 40px -14px rgb(0 0 0 / 70%);
+  --obsidian-shadow-hover: 0 2px 6px rgb(0 0 0 / 55%), 0 24px 52px -16px rgb(0 0 0 / 80%);
+  --obsidian-discover-surface: rgb(24 24 27 / 85%);
+  --obsidian-discover-text: #fafafa;
+  --obsidian-discover-fill: #3b82f6;
+  --obsidian-discover-active-text: #0b1220;
+}
+
+/*
+ * Restyle the existing border/shadow utilities inside the scope: soft radii
+ * and blurred shadows instead of square corners and hard offsets. The border
+ * *widths* and every layout/spacing utility are left alone, so the page keeps
+ * its exact structure.
+ */
+.theme-obsidian .border-brutal {
+  border-color: var(--obsidian-edge);
+  border-radius: var(--obsidian-radius);
+}
+
+.theme-obsidian .border-brutal-thin {
+  border-color: var(--obsidian-edge);
+  border-radius: calc(var(--obsidian-radius) - 2px);
+}
+
+.theme-obsidian .shadow-brutal-sm {
+  box-shadow: var(--obsidian-shadow-sm);
+}
+
+.theme-obsidian .shadow-brutal,
+.theme-obsidian .shadow-brutal-lg {
+  box-shadow: var(--obsidian-shadow-hover);
+}
+
+/*
+ * Premium hover: a subtle lift instead of the Neobrutalist shadow collapse.
+ * Wrapped in `no-preference` so `prefers-reduced-motion` users keep the static
+ * state (the global reduced-motion rule already disables the transition).
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .theme-obsidian .brutal-press:hover {
+    box-shadow: var(--obsidian-shadow-hover);
+    transform: translateY(-2px);
+  }
+}
+
 /* Tailwind v4 has no `--border-width-*` theme namespace, so borders are utilities. */
 @utility border-brutal {
   border-width: 3px;
