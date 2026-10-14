@@ -18,14 +18,6 @@
   --foreground: #09090b;
   --accent: #f4f4f5;
 
-  /* Discover Button tokens (kept under the obsidian prefix for compatibility
-     with components/block/discover-button.css). */
-  --obsidian-discover-surface: rgb(255 255 255 / 92%);
-  --obsidian-discover-text: #09090b;
-  --obsidian-discover-fill: #18181b;
-  --obsidian-discover-active-text: #ffffff;
-  --obsidian-discover-border: #71717a;
-
   /*
    * shadcn/ui token layer (Tailwind v4). Kept in HEX, not the OKLCH default,
    * so the premium palette stays the single source of truth. Denslab values win
@@ -59,12 +51,6 @@
   --foreground: #fafafa;
   --accent: #27272a;
 
-  --obsidian-discover-surface: rgb(24 24 27 / 85%);
-  --obsidian-discover-text: #fafafa;
-  --obsidian-discover-fill: #3b82f6;
-  --obsidian-discover-active-text: #0b1220;
-  --obsidian-discover-border: #71717a;
-
   /*
    * Premium dark premium tokens in HEX. This block replaces the `.dark` block
    * the default shadcn setup writes: denslab drives the theme with
@@ -85,7 +71,7 @@
   --muted-foreground: #a1a1aa;
   --accent-foreground: #fafafa;
   --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
+  --destructive-foreground: #09090b;
   --border: #27272a;
   --input: #27272a;
   --ring: #3b82f6;
@@ -98,6 +84,10 @@
    * `:root` / `[data-theme="dark"]` blocks above.
    */
   --color-background: var(--background);
+  /* `--color-foreground` was missing from this map, so Tailwind generated no
+     `.text-foreground` (or `/80`) rule at all — silent, like every other
+     un-mapped token. Found while verifying the navbar's inactive-link colour. */
+  --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -180,5 +170,150 @@
   :focus-visible {
     outline: 3px solid var(--ring);
     outline-offset: 2px;
+  }
+}
+
+/*
+ * Frosted-glass surfaces for the navbar and footer.
+ *
+ * Preset control lives here, not in the components: flipping the default is a
+ * one-line change on the `data-surface` attribute (default below is `frosted`),
+ * and the components stay free of blur/opacity Classes to drift apart. Three
+ * presets only:
+ *
+ *   solid         -> opaque background, no blur (previous behaviour)
+ *   frosted       -> flashy but readable: background/70 + blur-md + saturate
+ *   frosted-thin  -> background/50 + blur-sm + a lighter saturate ("ice")
+ *
+ * `backdrop-filter` is only visible over a translucent background, so the two
+ * must move together — never set one without the other.
+ *
+ * Fallbacks, both `@supports` based rather than utility overrides: Tailwind v4
+ * compiles `bg-background/70` to `color-mix(in oklab, var(...) 70%, transparent)`
+ * so a plain shape cannot beat it without `!important`. If backdrop-filter is
+ * unsupported the blur is dropped; if `color-mix()` is unsupported the surface
+ * is forced fully opaque. Either way "translucent without blur" never ships.
+ */
+[data-surface] {
+  --nav-surface: var(--background);
+  --nav-filter: none;
+}
+
+[data-surface="solid"] {
+  --nav-surface: var(--background);
+  --nav-filter: none;
+}
+
+/*
+ * Opacity is per-theme on purpose, and it is a contrast floor, not a taste
+ * setting: with busy content behind the bar the muted/`foreground/80` labels
+ * need >=4.5:1, and the required surface opacity differs by theme because the
+ * dark wash (to-black/30) sits on top of an already-dark surface. Measured
+ * minimums, so do not lower these without re-running the contrast check:
+ *   light -> 85%   (at 70% the labels scored 3.52:1)
+ *   dark  -> 75%   (at 70% the labels scored 3.00:1)
+ */
+[data-theme="light"],
+:root {
+  --nav-opacity: 85%;
+  --nav-blur: 12px;
+  --nav-sat: 180%;
+}
+
+[data-theme="dark"] {
+  --nav-opacity: 75%;
+  --nav-blur: 12px;
+  --nav-sat: 180%;
+}
+
+[data-surface="frosted"],
+[data-surface="frosted-thin"] {
+  --nav-surface: color-mix(in oklab, var(--background) var(--nav-opacity), transparent);
+  --nav-filter: blur(var(--nav-blur)) saturate(var(--nav-sat));
+}
+
+/* Optional preset: lighter blur and a thinner surface. At 50% it does NOT meet
+   the 4.5:1 floor over busy content — left as-is deliberately, it is an opt-in
+   look, not the default. */
+[data-surface="frosted-thin"] {
+  --nav-opacity: 50%;
+  --nav-blur: 6px;
+  --nav-sat: 140%;
+}
+
+@layer base {
+  [data-surface] {
+    background-color: var(--nav-surface);
+    -webkit-backdrop-filter: var(--nav-filter);
+    backdrop-filter: var(--nav-filter);
+  }
+
+  /*
+   * Accessibility: macOS "Reduce transparency" must actually kill the blur and
+   * the translucency behind it, or the setting looks broken. `!important` is
+   * load-bearing here — the surface variables are set by attribute selectors of
+   * equal specificity, and the solid fallback has to beat whichever preset is
+   * active.
+   */
+  @media (prefers-reduced-transparency: reduce) {
+    [data-surface] {
+      background-color: var(--background) !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  [data-surface] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@supports not (background-color: color-mix(in oklab, red 50%, transparent)) {
+  [data-surface] {
+    background-color: var(--background) !important;
+  }
+}
+
+/*
+ * Wordmark hover flip (components/denslab-wordmark-link.tsx).
+ *
+ * Declared here rather than as Tailwind arbitrary values because Tailwind v4
+ * emits no rule at all for `transition-delay-[var(--x)]` — verified against the
+ * built bundle, zero `transition-delay` rules were generated, so the letters
+ * would flip in unison with no stagger.
+ *
+ * Each letter carries two custom properties, the incoming and outgoing delay.
+ * The base rule uses the outgoing one, :hover swaps to the incoming one, so the
+ * sequence runs forward on hover and unwinds in reverse on leave. Both live on
+ * the letter rather than the group because the delay value differs per letter.
+ */
+.denslab-wordmark-letter {
+  display: inline-block;
+  transform-style: preserve-3d;
+  transition-property: transform;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  transition-delay: var(--denslab-delay-out);
+}
+
+.denslab-wordmark-group:hover .denslab-wordmark-letter {
+  transform: rotateX(calc(160deg * -1)) rotateY(160deg);
+  transition-delay: var(--denslab-delay-in);
+}
+
+/*
+ * Reduced motion, restated for this component. The blanket rule above already
+ * forces `transition-duration: 0.01ms !important` and would normally suffice,
+ * but the flip is the whole point of this element — a local rule keeps it static
+ * even if that global block is ever reorganised. No `@keyframes` is involved, so
+ * a collapsed duration means the letters snap with no animation.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .denslab-wordmark-letter {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
   }
 }

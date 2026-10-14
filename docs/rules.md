@@ -18,9 +18,9 @@ AI-generated dan fotografi konseptual.
 | Lapisan | Teknologi | Versi |
 |---|---|---|
 | Framework | Next.js App Router + Turbopack | 16.3.6 |
-| UI | React | 19.2.8 |
+| UI | React + shadcn/ui (primitif di `components/ui/`) | 19.2.8 |
 | Styling | Tailwind CSS | v4 |
-| Animasi | Framer Motion | 13.x |
+| Animasi | Framer Motion + `tailwindcss-animate` | 13.x |
 | Ikon | Lucide React | 1.x |
 | Database & Auth | Supabase (PostgreSQL + GoTrue) | supabase-js 2.x |
 | Hosting gambar | Imgur (`i.imgur.com`) | — |
@@ -30,50 +30,69 @@ AI-generated dan fotografi konseptual.
 `revalidateTag(tag)` satu argumen sudah deprecated — gunakan
 `revalidateTag(tag, "max")`.
 
-## 3. Desain: Neobrutalism (Palet 3 Warna)
+## 3. Desain: shadcn/ui + Palet Premium
+
+Gaya visual = **default shadcn/ui mentah** di atas palet premium denslab. Tidak ada
+utility desain kustom: seluruh styling memakai kelas Tailwind bawaan dan token
+shadcn di `app/globals.css`. Komponen primitif ada di `components/ui/`.
 
 ### Token warna
 
-Tiga warna asli dipertahankan, ditambah dua token peran untuk menyelesaikan
-masalah kontras di dark mode.
-
 | Token | Light | Dark | Peran |
 |---|---|---|---|
-| `--canvas` | `#FFFDF8` | `#18181B` | Latar halaman |
-| `--accent` | `#FFDE59` | `#FFDE59` | Kuning listrik, sama di dua mode |
-| `--ink` | `#000000` | `#FFFDF8` | Teks di atas canvas |
-| `--on-accent` | `#000000` | `#000000` | Teks di atas accent, selalu hitam |
-| `--edge` | `#000000` | `#000000` | Border & hard shadow, selalu hitam |
+| `--background` | `#fafafa` | `#09090b` | Latar halaman |
+| `--card` | `#ffffff` | `#18181b` | Surface kartu/panel |
+| `--foreground` | `#09090b` | `#fafafa` | Teks utama |
+| `--primary` | `#2563eb` | **`#3b82f6`** | Aksi utama — biru merek denslab |
+| `--primary-foreground` | `#ffffff` | `#0b1220` | Teks di atas `--primary` |
+| `--secondary` | `#f4f4f5` | `#27272a` | Surface sekunder |
+| `--muted` | `#f4f4f5` | `#27272a` | Surface redup (placeholder, skeleton) |
+| `--muted-foreground` | `#52525b` | `#a1a1aa` | Teks redup |
+| `--accent` | `#f4f4f5` | `#27272a` | **Netral abu**, bukan biru — hover/focus surface |
+| `--border` | `#e4e4e7` | `#27272a` | Garis border |
+| `--input` | `#e4e4e7` | `#27272a` | Border input |
+| `--ring` | `#2563eb` | `#3b82f6` | Cincin focus |
+| `--destructive` | `#dc2626` | `#ef4444` | Aksi merusak |
+| `--radius` | `0.75rem` | `0.75rem` | Radius sudut, sama di dua mode |
 
-**Mengapa dipisah:** `--ink` semula dipakai untuk teks, border, dan shadow
-sekaligus. Saat dark mode aktif, teks menjadi putih — tetapi border dan shadow
-ikut putih sehingga garis tegas Neobrutalist hilang.
+`--accent` sengaja **netral**, bukan biru: ia dipakai sebagai surface hover/focus
+(`hover:bg-accent`, `focus:bg-accent`), sehingga tidak boleh bersaing dengan
+`--primary` yang menandai aksi utama.
 
-**Aturan pakai:**
-- Teks di atas `bg-accent` → `text-on-accent`
-- Teks di atas `bg-canvas` → `text-ink`
-- Border dan shadow → selalu lewat utility yang memakai `--edge`
+Token ditulis dalam **HEX**, bukan OKLCH bawaan shadcn, agar palet premium tetap
+jadi satu-satunya sumber kebenaran. `--primary-foreground` dark (`#0b1220`) dan
+light (`#ffffff`) juga nilai denslab sendiri, bukan nilai referensi shadcn.
 
-### Utility
+Wrapper Obsidian (`--obsidian-discover-*`) masih ada di `app/globals.css` untuk
+kompatibilitas `components/block/discover-button.css`. Jangan dibuang tanpa
+memindahkan komponennya.
 
-| Utility | Fungsi |
+### Aturan styling
+
+| Kebutuhan | Cara sekarang (bawaan Tailwind/shadcn) |
 |---|---|
-| `border-brutal` | Border 3px solid |
-| `border-brutal-thin` | Border 2px solid |
-| `brutal-press` | Hover: shadow mengecil + `translate(3px,3px)` |
-| `brutal-flat-hover` | Hover: hanya border berubah ke accent |
-| `brutal-fade` | Hover: hanya opacity meredup, untuk aksi sekunder |
-| `brutal-skeleton` | Strip diagonal bergerak untuk loading |
-| `brutal-placeholder` | Pola diagonal untuk gambar tidak tersedia |
+| Border | **1px** Tailwind default — `border`, `border-b`, `border-t`, `border-l` |
+| Radius | `rounded-sm` / `rounded-md` / `rounded-lg` / `rounded-xl` → turunan `--radius` |
+| Elevasi | `shadow-sm` / `shadow` / `shadow-md` / `shadow-lg` (blur lembut) |
+| Hover/active | `hover:bg-accent/50`, `focus:bg-accent`, `transition-colors` |
+| Loading | `animate-pulse bg-muted` |
+| Gambar tidak tersedia | `bg-muted` |
+| Aksen hover pada border | `hover:border-primary` / `hover:border-accent` |
+| Focus | `focus-visible:ring-2 ring-ring ring-offset-2 ring-offset-background` |
 
-Shadow tanpa blur: `--shadow-brutal-sm` (4px), `--shadow-brutal` (5px),
-`--shadow-brutal-lg` (6px), `--shadow-brutal-press` (2px).
+Radius turunan didefinisikan di `app/globals.css`:
+`--radius-sm: calc(var(--radius) - 4px)`, `--radius-md: calc(var(--radius) - 2px)`,
+`--radius-lg: var(--radius)`, `--radius-xl: calc(var(--radius) + 4px)`.
 
 ### Tipografi
 
-- Display/body: **Space Grotesk** (`font-display`)
-- Metadata/mono: **Geist Mono** (`font-mono`)
-- Sudut selalu tegak (`--radius-brutal: 0px`)
+- Body/display: **stack font sistem** dari Tailwind v4 — `-apple-system`,
+  `BlinkMacSystemFont`, `"Segoe UI"`, `Roboto`, dll. `app/layout.tsx` **tidak**
+  memuat `next/font` apa pun.
+- Mono: `font-mono` bawaan Tailwind (`ui-monospace, SFMono-Regular, Menlo, ...`).
+  Pakai **hanya** untuk teks semantik mono: prompt, metadata, dan `<code>`.
+- Heading memakai `font-semibold` + **`tracking-tight`**. Tidak ada `tracking-wide`.
+- Tidak ada kelas `font-display` dan tidak ada webfont kustom.
 
 ### Tema
 

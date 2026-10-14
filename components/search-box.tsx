@@ -22,16 +22,16 @@ export function SearchBox({
   preserve?: Record<string, string>;
 }) {
   return (
-    <form action={action} role="search" className="flex w-full max-w-xl gap-2">
+    <form
+      action={action}
+      role="search"
+      className="flex w-full max-w-xl items-stretch gap-2"
+    >
       {Object.entries(preserve).map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}
 
       <div className="relative flex-1">
-        <Search
-          className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
-          aria-hidden="true"
-        />
         <Input
           type="search"
           name="q"
@@ -39,12 +39,18 @@ export function SearchBox({
           placeholder="Search title, description, or tag"
           aria-label="Search posts"
           maxLength={80}
-          className="pl-9"
+          className="h-full pl-3"
         />
       </div>
 
-      <Button type="submit" className="shrink-0">
-        Search
+      <Button
+        type="submit"
+        size="icon"
+        className="size-11 shrink-0 [&_svg]:size-5"
+        aria-label="Search"
+        title="Search"
+      >
+        <Search className="size-5" aria-hidden="true" />
       </Button>
 
       {defaultValue && (

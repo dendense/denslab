@@ -51,6 +51,7 @@ export function ThemeToggle() {
       type="button"
       variant="outline"
       size="icon"
+      className="h-11 w-11"
       onClick={toggleTheme}
       title={label}
       aria-label={label}

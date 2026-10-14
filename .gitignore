@@ -42,3 +42,6 @@ next-env.d.ts
 
 # local agent instructions, not part of the published project
 .kilo/
+
+# local verification screenshots
+.yuki-shots/

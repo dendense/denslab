@@ -2,7 +2,7 @@
 
 import { Check, Copy, Lock } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +27,51 @@ const PHOTO_FIELDS: { key: keyof PhotoMetadata; label: string }[] = [
   { key: "iso", label: "ISO" },
 ];
 
+/** A field counts as present when it holds text or a finite number. */
+function hasValue(value: unknown): boolean {
+  if (typeof value === "number") return Number.isFinite(value);
+  if (typeof value === "string") return value.trim().length > 0;
+  return value !== null && value !== undefined;
+}
+
+/**
+ * Long prompt text, clamped to five lines until the reader asks for the rest.
+ * A real <button> with aria-expanded/aria-controls rather than <details>, so the
+ * toggle stays keyboard-reachable and keeps the shadcn button styling. The label
+ * always renders: deciding "does this overflow five lines?" in JS would need a
+ * measurement pass and would get the answer wrong before layout settles.
+ */
+function PromptText({ label, text }: { label: string; text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const contentId = useId();
+
+  return (
+    <div className="space-y-1.5">
+      <p className="text-sm font-medium leading-none">{label}</p>
+      <p
+        id={contentId}
+        className={`break-words font-mono text-xs leading-relaxed ${
+          expanded ? "line-clamp-none" : "line-clamp-5"
+        }`}
+      >
+        {text}
+      </p>
+      <Button
+        type="button"
+        variant="link"
+        size="sm"
+        className="h-auto p-0 text-xs focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        aria-expanded={expanded}
+        aria-controls={contentId}
+        onClick={() => setExpanded((open) => !open)}
+      >
+        {expanded ? "Show less" : "Show more"}
+        <span className="sr-only"> {label.toLowerCase()}</span>
+      </Button>
+    </div>
+  );
+}
+
 /**
  * Gated technical details, shaped by category: AI posts reveal the prompt and
  * generation settings, Photoshoot posts reveal capture settings. Guests get a
@@ -48,6 +93,15 @@ export function PromptPanel({
     : "Login or register to reveal the capture settings.";
   const ctaButton = isAi ? "Login to reveal prompt" : "Login to reveal settings";
 
+  const prompt = isAi ? post.metadata.prompt : "";
+  const negativePrompt = isAi ? post.metadata.negativePrompt : "";
+
+  const fields = (isAi ? AI_FIELDS : PHOTO_FIELDS).filter(({ key }) =>
+    isAi
+      ? hasValue(post.metadata[key as keyof AiMetadata])
+      : hasValue(post.photoMetadata[key as keyof PhotoMetadata]),
+  );
+
   async function copyPrompt() {
     if (!isAi) return;
 
@@ -64,8 +118,13 @@ export function PromptPanel({
     }
   }
 
+  // Nothing to show would mean a panel with a heading and no content.
+  if (!hasValue(prompt) && !hasValue(negativePrompt) && fields.length === 0) {
+    return null;
+  }
+
   return (
-    <Card aria-labelledby="details-heading">
+    <Card aria-labelledby="details-heading" className="overflow-hidden">
       <CardHeader className="flex-row items-center justify-between space-y-0">
         <CardTitle id="details-heading">{heading}</CardTitle>
 
@@ -86,49 +145,37 @@ export function PromptPanel({
         ) : null}
       </CardHeader>
 
-      <CardContent className="relative">
-        <div
-          aria-hidden={!isAuthenticated}
-          className={`space-y-4 ${
-            isAuthenticated ? "" : "select-none blur-[6px]"
-          }`}
-        >
-          {isAi && (
-            <>
-              <div className="space-y-1.5">
-                <p className="text-sm font-medium leading-none">Positive prompt</p>
-                <p className="break-words font-mono text-xs leading-relaxed">
-                  {post.metadata.prompt}
-                </p>
-              </div>
+      <CardContent>
+        <div aria-hidden={!isAuthenticated} className="space-y-4 select-none blur-[6px]">
+          {hasValue(prompt) && <PromptText label="Positive prompt" text={prompt} />}
 
-              <div className="space-y-1.5">
-                <p className="text-sm font-medium leading-none">Negative prompt</p>
-                <p className="break-words font-mono text-xs leading-relaxed">
-                  {post.metadata.negativePrompt || "—"}
-                </p>
-              </div>
-            </>
+          {hasValue(negativePrompt) && (
+            <PromptText
+              label="Negative prompt"
+              text={negativePrompt}
+            />
           )}
 
-          <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {(isAi ? AI_FIELDS : PHOTO_FIELDS).map(({ key, label }) => (
-              <div key={key} className="space-y-1">
-                <dt className="text-sm font-medium leading-none">{label}</dt>
-                <dd className="break-all font-mono text-xs">
-                  {isAi
-                    ? String(post.metadata[key as keyof AiMetadata])
-                    : String(
-                        post.photoMetadata[key as keyof PhotoMetadata],
-                      )}
-                </dd>
-              </div>
-            ))}
-          </dl>
+          {fields.length > 0 && (
+            <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {fields.map(({ key, label }) => (
+                <div key={key} className="space-y-1">
+                  <dt className="text-sm font-medium leading-none">{label}</dt>
+                  <dd className="break-all font-mono text-xs">
+                    {isAi
+                      ? String(post.metadata[key as keyof AiMetadata])
+                      : String(
+                          post.photoMetadata[key as keyof PhotoMetadata],
+                        )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
         </div>
 
         {!isAuthenticated && (
-          <div className="bg-background absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 border-t p-5 text-center sm:p-6">
+          <div className="bg-background mt-4 flex flex-col items-center gap-3 border-t pt-5 text-center sm:pt-6">
             <p className="max-w-xs text-sm font-medium sm:text-base">{cta}</p>
             <Button asChild>
               <Link href="/login">

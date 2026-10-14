@@ -1,4 +1,6 @@
-import { DiscoverButton } from "@/components/block/discover-button";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { GalleryGrid } from "@/components/gallery-grid";
 import { Pagination } from "@/components/pagination";
 import { SearchBox } from "@/components/search-box";
@@ -26,18 +28,27 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           Visual stories from the edge of reality &amp; imagination.
         </h1>
         <p className="text-muted-foreground mt-3 text-sm">
-          {search
-            ? `${total} ${total === 1 ? "result" : "results"} for “${search}”`
-            : `${total} ${total === 1 ? "entry" : "entries"} — AI-generated work and photographs, with the prompt or the camera settings behind each one.`}
+          {search ? (
+            `${total} ${total === 1 ? "result" : "results"} for “${search}”`
+          ) : (
+            <>
+              {`${total} ${total === 1 ? "entry" : "entries"} — AI-generated work and photographs, with the prompt or the camera settings`}{" "}
+              <span className="block">behind each one.</span>
+            </>
+          )}
         </p>
 
         <div className="mt-5">
           <SearchBox action="/" defaultValue={search} />
         </div>
 
-        {/* ObsidianUI-derived CTA: routes to the category browser. */}
         <div className="mt-6">
-          <DiscoverButton label="Explore categories" href="/categories" />
+          <Button asChild>
+            <Link href="/categories">
+              Explore categories
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          </Button>
         </div>
       </header>
 
