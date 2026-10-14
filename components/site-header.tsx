@@ -114,7 +114,7 @@ function useSessionUser() {
 }
 
 /** Nav item shared by the desktop row and the mobile drawer. */
-const navLink = "border-brutal-thin font-display text-base font-bold";
+const navLink = "text-sm font-medium";
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -127,8 +127,10 @@ export function SiteHeader() {
         <Link
           href={categoryLink.href}
           aria-current={pathname.startsWith(categoryLink.href) ? "page" : undefined}
-          className={`${navLink} block px-4 py-1.5 brutal-press ${
-            pathname.startsWith(categoryLink.href) ? "bg-accent text-on-accent" : ""
+          className={`${navLink} block rounded-md px-4 py-1.5 transition-colors ${
+            pathname.startsWith(categoryLink.href)
+              ? "bg-primary text-primary-foreground"
+              : "hover:bg-accent hover:text-accent-foreground"
           }`}
         >
           {categoryLink.label}
@@ -138,8 +140,10 @@ export function SiteHeader() {
         <Link
           href={aboutLink.href}
           aria-current={pathname === aboutLink.href ? "page" : undefined}
-          className={`${navLink} block px-4 py-1.5 brutal-press ${
-            pathname === aboutLink.href ? "bg-accent text-on-accent" : ""
+          className={`${navLink} block rounded-md px-4 py-1.5 transition-colors ${
+            pathname === aboutLink.href
+              ? "bg-primary text-primary-foreground"
+              : "hover:bg-accent hover:text-accent-foreground"
           }`}
         >
           {aboutLink.label}
@@ -150,8 +154,10 @@ export function SiteHeader() {
           <Link
             href="/bookmarks"
             aria-current={pathname === "/bookmarks" ? "page" : undefined}
-            className={`${navLink} flex items-center gap-1.5 px-4 py-1.5 brutal-press ${
-              pathname === "/bookmarks" ? "bg-accent text-on-accent" : ""
+            className={`${navLink} flex items-center gap-1.5 rounded-md px-4 py-1.5 transition-colors ${
+              pathname === "/bookmarks"
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-accent hover:text-accent-foreground"
             }`}
           >
             <Bookmark className="h-4 w-4" aria-hidden="true" />
@@ -164,8 +170,10 @@ export function SiteHeader() {
           <Link
             href="/admin"
             aria-current={pathname.startsWith("/admin") ? "page" : undefined}
-            className={`${navLink} flex items-center gap-1.5 px-4 py-1.5 brutal-press ${
-              pathname.startsWith("/admin") ? "bg-accent text-on-accent" : ""
+            className={`${navLink} flex items-center gap-1.5 rounded-md px-4 py-1.5 transition-colors ${
+              pathname.startsWith("/admin")
+                ? "bg-primary text-primary-foreground"
+                : "hover:bg-accent hover:text-accent-foreground"
             }`}
           >
             <ShieldCheck className="h-4 w-4" aria-hidden="true" />
@@ -177,10 +185,7 @@ export function SiteHeader() {
         {user ? (
           <AccountMenu user={user} />
         ) : (
-          <Button
-            asChild
-            className="border-brutal-thin h-auto rounded-none bg-accent px-4 py-1.5 font-display text-base font-bold text-on-accent shadow-none brutal-press hover:bg-accent"
-          >
+          <Button asChild size="sm">
             <Link href="/login">Login</Link>
           </Button>
         )}
@@ -194,14 +199,14 @@ export function SiteHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-40 border-b-brutal bg-canvas">
+    <header className="bg-background sticky top-0 z-40 border-b">
       <nav
         aria-label="Main navigation"
         className="flex w-full items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-10"
       >
         <Link
           href="/"
-          className="border-brutal bg-accent px-3 py-1 font-display text-lg font-bold tracking-tight text-on-accent shadow-brutal-sm brutal-press sm:text-xl"
+          className="bg-primary text-primary-foreground rounded-md px-3 py-1 text-lg font-semibold transition-colors hover:bg-primary/90"
         >
           denslab.
         </Link>
@@ -214,24 +219,14 @@ export function SiteHeader() {
           <ThemeToggle />
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="Open menu"
-                className="border-brutal-thin h-9 w-9 rounded-none bg-canvas text-ink shadow-none brutal-press hover:bg-canvas sm:h-10 sm:w-10"
-              >
+              <Button variant="outline" size="icon" aria-label="Open menu">
                 <Menu className="h-5 w-5" aria-hidden="true" />
               </Button>
             </SheetTrigger>
 
-            <SheetContent
-              side="right"
-              className="border-l-brutal w-72 bg-canvas text-ink sm:max-w-xs"
-            >
-              <SheetHeader className="border-b-brutal">
-                <SheetTitle className="font-display text-base font-bold uppercase tracking-wide">
-                  Menu
-                </SheetTitle>
+            <SheetContent side="right" className="w-72 sm:max-w-xs">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
               </SheetHeader>
 
               <ul
@@ -257,23 +252,20 @@ function AccountMenu({ user }: { user: SessionUser }) {
   const onSettings = usePathname() === "/settings";
 
   return (
-    <div className="border-brutal-thin flex items-center gap-2 bg-canvas px-2 py-1.5">
+    <div className="flex items-center gap-2">
       <Link
         href="/settings"
         title={user.displayName}
         aria-current={onSettings ? "page" : undefined}
-        className="max-w-[6rem] truncate font-display text-sm font-bold underline-offset-4 brutal-fade hover:underline"
+        className="max-w-[6rem] truncate text-sm font-medium underline-offset-4 hover:underline"
       >
         {user.username}
       </Link>
 
       <form action="/auth/signout" method="post">
-        <button
-          type="submit"
-          className="border-brutal-thin px-2 py-0.5 font-display text-xs font-bold brutal-fade"
-        >
+        <Button type="submit" variant="ghost" size="sm">
           Sign out
-        </button>
+        </Button>
       </form>
     </div>
   );

@@ -36,7 +36,7 @@ export function PostCard({
       whileInView="visible"
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="group border-brutal mb-4 break-inside-avoid bg-canvas shadow-brutal-sm sm:mb-5 lg:mb-6"
+      className="bg-card text-card-foreground group mb-4 block break-inside-avoid overflow-hidden rounded-xl border shadow-sm sm:mb-5 lg:mb-6"
     >
       <Link href={`/photo/${post.id}`} className="block">
         <div className="relative">
@@ -48,6 +48,8 @@ export function PostCard({
             <Skeleton className="absolute inset-0 h-full w-full" />
           )}
 
+          {/* The image sits flush against the card edge; the container's
+              overflow-hidden + rounded-xl clips it to the card radius. */}
           <PostImage
             imgurId={post.imgurId}
             alt={post.title}
@@ -58,27 +60,27 @@ export function PostCard({
             priority={priority}
             imageAvailable={post.imageAvailable}
             onSettled={() => setLoaded(true)}
-            className="w-full border-b-brutal object-cover"
+            className="w-full object-cover"
           />
 
           {/*
             Hover-revealed on pointer devices; always visible on touch, where
             there is no hover state to reveal it.
           */}
-          <Badge className="pointer-events-none absolute left-2 top-2 shadow-brutal-sm transition-opacity duration-200 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 motion-reduce:transition-none sm:left-2.5 sm:top-2.5">
+          <Badge className="pointer-events-none absolute left-2 top-2 opacity-100 transition-opacity duration-200 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 motion-reduce:transition-none">
             {post.category}
           </Badge>
         </div>
 
         <div className="flex items-center justify-between gap-2 p-3 sm:gap-3 sm:p-4">
-          <h2 className="font-display text-base font-bold leading-snug sm:text-lg lg:text-xl">
+          <h2 className="text-base font-semibold leading-snug sm:text-lg">
             {post.title}
           </h2>
 
-          <span className="border-brutal-thin flex shrink-0 items-center gap-1 bg-accent px-1.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-on-accent sm:px-2">
+          <Badge className="shrink-0">
             Details
             <ArrowRight className="h-3 w-3" aria-hidden="true" />
-          </span>
+          </Badge>
         </div>
       </Link>
     </motion.article>

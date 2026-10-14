@@ -69,7 +69,7 @@ export default async function PhotoDetailPage({
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
       <Link
         href="/"
-        className="border-brutal-thin mb-6 inline-flex items-center gap-2 px-3 py-1.5 font-display text-sm font-bold brutal-press"
+        className="mb-6 inline-flex items-center gap-2 text-sm font-medium underline-offset-4 hover:underline"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         Back to gallery
@@ -77,7 +77,7 @@ export default async function PhotoDetailPage({
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
         <div className="lg:col-span-2">
-          <figure className="border-brutal bg-canvas shadow-brutal">
+          <figure className="bg-card overflow-hidden rounded-xl border shadow-sm">
             <PostImage
               imgurId={post.imgurId}
               alt={post.title}
@@ -95,10 +95,10 @@ export default async function PhotoDetailPage({
         <div className="space-y-6">
           <div className="space-y-3">
             <Badge>{post.category}</Badge>
-            <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">
+            <h1 className="text-3xl font-semibold tracking-tight leading-tight sm:text-4xl">
               {post.title}
             </h1>
-            <p className="font-mono text-xs leading-relaxed sm:text-sm">
+            <p className="text-muted-foreground text-sm">
               {post.description}
             </p>
 
@@ -106,7 +106,7 @@ export default async function PhotoDetailPage({
               {post.tags.map((tag) => (
                 <li
                   key={tag}
-                  className="border-brutal-thin px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide"
+                  className="rounded-md border px-2.5 py-0.5 text-xs font-semibold"
                 >
                   {tag}
                 </li>
@@ -122,9 +122,9 @@ export default async function PhotoDetailPage({
               <DonateButton />
             </div>
 
-            <dl className="grid grid-cols-2 gap-2 border-t-brutal-thin pt-4 font-mono text-xs">
+            <dl className="grid grid-cols-2 gap-2 border-t border-border pt-4 text-xs">
               <div>
-                <dt className="text-[10px] font-bold uppercase tracking-wide">
+                <dt className="text-xs font-medium">
                   Resolution
                 </dt>
                 <dd>
@@ -132,7 +132,7 @@ export default async function PhotoDetailPage({
                 </dd>
               </div>
               <div>
-                <dt className="text-[10px] font-bold uppercase tracking-wide">
+                <dt className="text-xs font-medium">
                   Orientation
                 </dt>
                 <dd className="capitalize">{post.orientation}</dd>

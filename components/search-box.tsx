@@ -10,9 +10,6 @@ import { Input } from "@/components/ui/input";
  * so results are shareable and bookmarkable, pagination keeps the term, and the
  * page still works without JavaScript. Submitting resets `page` because the
  * form only carries the fields it declares.
- *
- * shadcn Input/Button supply the shell; denslab's brutal utilities and the mono
- * type keep the site's own look.
  */
 export function SearchBox({
   action = "/",
@@ -32,7 +29,7 @@ export function SearchBox({
 
       <div className="relative flex-1">
         <Search
-          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+          className="text-muted-foreground pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
           aria-hidden="true"
         />
         <Input
@@ -42,25 +39,18 @@ export function SearchBox({
           placeholder="Search title, description, or tag"
           aria-label="Search posts"
           maxLength={80}
-          className="border-brutal-thin h-11 rounded-none bg-canvas pl-9 pr-3 font-mono text-sm shadow-none focus-visible:ring-0"
+          className="pl-9"
         />
       </div>
 
-      <Button
-        type="submit"
-        className="border-brutal-thin h-11 shrink-0 rounded-none bg-accent px-4 font-display text-sm font-bold text-on-accent shadow-brutal-sm brutal-press hover:bg-accent"
-      >
+      <Button type="submit" className="shrink-0">
         Search
       </Button>
 
       {defaultValue && (
-        <Button
-          asChild
-          variant="outline"
-          className="border-brutal-thin h-11 w-11 shrink-0 rounded-none bg-canvas p-0 brutal-press hover:bg-canvas"
-        >
+        <Button asChild variant="outline" size="icon" className="shrink-0">
           <Link href={action} aria-label="Clear search" title="Clear search">
-            <X className="h-4 w-4" aria-hidden="true" />
+            <X aria-hidden="true" />
           </Link>
         </Button>
       )}

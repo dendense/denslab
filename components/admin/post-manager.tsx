@@ -4,6 +4,8 @@ import { Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { deletePost } from "@/app/admin/actions";
 import { PostForm } from "@/components/admin/post-form";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Post } from "@/lib/posts";
 
 type Row = Pick<Post, "id" | "title" | "category" | "tags"> & {
@@ -38,48 +40,45 @@ export function PostManager({ posts }: { posts: Row[] }) {
 
   if (mode.kind === "create" || mode.kind === "edit") {
     return (
-      <section className="border-brutal bg-canvas p-4 shadow-brutal-sm sm:p-6">
-        <header className="mb-5 flex items-center justify-between gap-3">
-          <h2 className="font-display text-lg font-bold sm:text-xl">
+      <Card className="p-6">
+        <CardHeader className="flex-row items-center justify-between space-y-0 p-0 pb-5">
+          <CardTitle>
             {mode.kind === "create" ? "New post" : "Edit post"}
-          </h2>
-          <button
+          </CardTitle>
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={() => setMode({ kind: "list" })}
             aria-label="Close form"
-            className="border-brutal-thin flex h-8 w-8 items-center justify-center brutal-press"
           >
-            <X className="h-4 w-4" aria-hidden="true" />
-          </button>
-        </header>
+            <X aria-hidden="true" />
+          </Button>
+        </CardHeader>
 
         <PostForm
           post={mode.kind === "edit" ? mode.post : undefined}
           onDone={() => setMode({ kind: "list" })}
           onCancel={() => setMode({ kind: "list" })}
         />
-      </section>
+      </Card>
     );
   }
 
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-display text-lg font-bold sm:text-xl">Posts</h2>
-        <button
-          type="button"
-          onClick={() => setMode({ kind: "create" })}
-          className="border-brutal-thin inline-flex items-center gap-2 bg-accent px-3 py-2 font-display text-sm font-bold text-on-accent shadow-brutal-sm brutal-press"
-        >
-          <Plus className="h-4 w-4" aria-hidden="true" />
+        <h2 className="text-lg font-semibold sm:text-xl">Posts</h2>
+        <Button type="button" onClick={() => setMode({ kind: "create" })}>
+          <Plus aria-hidden="true" />
           New post
-        </button>
+        </Button>
       </div>
 
       {error && (
         <p
           role="alert"
-          className="border-brutal-thin bg-canvas px-3 py-2 font-mono text-xs"
+          className="bg-muted text-muted-foreground rounded-md px-3 py-2 text-sm"
         >
           {error}
         </p>
@@ -89,18 +88,20 @@ export function PostManager({ posts }: { posts: Row[] }) {
         {posts.map((row) => (
           <li
             key={row.id}
-            className="border-brutal-thin flex flex-wrap items-center justify-between gap-3 bg-canvas p-3"
+            className="bg-card text-card-foreground flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"
           >
             <div className="min-w-0">
-              <p className="truncate font-display text-sm font-bold sm:text-base">
+              <p className="truncate text-sm font-medium sm:text-base">
                 {row.title}
               </p>
-              <p className="font-mono text-[11px]">{row.category}</p>
+              <p className="text-muted-foreground text-sm">{row.category}</p>
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => {
                   // The list row is trimmed for display; the form needs the full
                   // post, so it is refetched on the client before editing.
@@ -109,20 +110,20 @@ export function PostManager({ posts }: { posts: Row[] }) {
                     .then((full: Post) => setMode({ kind: "edit", post: full }))
                     .catch(() => setError("Could not load this post."));
                 }}
-                className="border-brutal-thin inline-flex items-center gap-1.5 px-3 py-1.5 font-display text-xs font-bold brutal-press"
               >
-                <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                <Pencil aria-hidden="true" />
                 Edit
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => setPendingDelete(row)}
-                className="border-brutal-thin inline-flex items-center gap-1.5 px-3 py-1.5 font-display text-xs font-bold brutal-press"
               >
-                <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                <Trash2 aria-hidden="true" />
                 Delete
-              </button>
+              </Button>
             </div>
           </li>
         ))}
@@ -133,41 +134,36 @@ export function PostManager({ posts }: { posts: Row[] }) {
           role="dialog"
           aria-modal="true"
           aria-labelledby="confirm-delete-heading"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-canvas/80 p-4"
+          className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4"
         >
-          <div className="border-brutal w-full max-w-md bg-canvas p-5 shadow-brutal-lg sm:p-6">
-            <h3
-              id="confirm-delete-heading"
-              className="font-display text-xl font-bold"
-            >
+          <div className="bg-background w-full max-w-md rounded-lg border p-6 shadow-lg">
+            <h3 id="confirm-delete-heading" className="text-lg font-semibold">
               Delete this post?
             </h3>
-            <p className="mt-2 font-mono text-xs leading-relaxed">
+            <p className="text-muted-foreground mt-2 text-sm">
               &ldquo;{pendingDelete.title}&rdquo; will be removed permanently.
               This cannot be undone.
             </p>
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
-              <button
+              <Button
                 type="button"
+                variant="destructive"
                 onClick={confirmDelete}
                 disabled={deleting}
                 aria-busy={deleting}
-                className="border-brutal-thin inline-flex items-center gap-2 bg-accent px-4 py-2 font-display text-sm font-bold text-on-accent shadow-brutal-sm brutal-press disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {deleting && (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                )}
+                {deleting && <Loader2 className="animate-spin" aria-hidden="true" />}
                 Yes, delete
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setPendingDelete(null)}
-                className="border-brutal-thin px-4 py-2 font-display text-sm font-bold brutal-press"
               >
                 Keep it
-              </button>
+              </Button>
             </div>
           </div>
         </div>

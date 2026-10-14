@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { imgurFullUrl } from "@/lib/posts";
+import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
   title: "About",
@@ -20,16 +21,14 @@ export default function AboutPage() {
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
       <article className="mx-auto max-w-4xl space-y-8 sm:space-y-10">
-        <header className="space-y-3 border-b-brutal pb-6 sm:space-y-4">
-          <span className="border-brutal-thin inline-block bg-accent px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-on-accent sm:text-[11px]">
-            About denslab
-          </span>
-          <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+        <header className="space-y-3 border-b border-border pb-6 sm:space-y-4">
+          <Badge>About denslab</Badge>
+          <h1 className="text-3xl font-semibold tracking-tight leading-tight sm:text-4xl lg:text-5xl">
             A laboratory for images and the ideas behind them.
           </h1>
         </header>
 
-        <p className="font-display text-lg leading-relaxed sm:text-xl lg:text-2xl">
+        <p className="text-lg leading-relaxed sm:text-xl lg:text-2xl">
           We&rsquo;re a community for people who see images as more than
           pictures. A place to share AI-generated art, conceptual photography,
           and the ideas behind them. Whether you&rsquo;re experimenting with new
@@ -37,16 +36,16 @@ export default function AboutPage() {
           imagination finds an audience and inspiration keeps moving.
         </p>
 
-        <figure className="border-brutal bg-canvas shadow-brutal">
+        <figure className="bg-card overflow-hidden rounded-xl border shadow-sm">
           <Image
             src="https://i.imgur.com/syCkh06.jpeg"
             alt={aboutImage.title}
             width={aboutImage.width}
             height={aboutImage.height}
             sizes="(min-width: 1024px) 896px, (min-width: 640px) 90vw, 100vw"
-            className="h-auto w-full border-b-brutal object-cover"
+            className="h-auto w-full border-b border-border object-cover"
           />
-          <figcaption className="px-4 py-3 font-mono text-xs sm:text-sm">
+          <figcaption className="text-muted-foreground px-4 py-3 text-sm">
             Art by @bloodexer - SMRRY
           </figcaption>
         </figure>

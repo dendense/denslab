@@ -41,16 +41,11 @@ function hrefFor(basePath: string, query: string, page: number) {
   return search ? `${basePath}?${search}` : basePath;
 }
 
-/** Shared cell geometry; `PaginationLink` only supplies the a11y wiring. */
-const cell =
-  "border-brutal-thin flex h-10 min-w-10 items-center justify-center rounded-none px-3 font-display text-sm font-bold";
-const disabled = `${cell} cursor-not-allowed opacity-40`;
-const active = `${cell} bg-accent text-on-accent hover:bg-accent`;
-
 /**
- * Numbered pagination. Rendered through the shadcn Pagination primitives, but
- * kept as links with real hrefs rather than client buttons, so each page stays
- * cacheable and works without JavaScript.
+ * Numbered pagination. Rendered through the shadcn Pagination primitives
+ * (`PaginationLink` already applies the shadcn button styles), kept as links
+ * with real hrefs rather than client buttons, so each page stays cacheable and
+ * works without JavaScript.
  */
 export function Pagination({
   page,
@@ -68,20 +63,22 @@ export function Pagination({
   const items = pageWindow(page, pageCount);
 
   return (
-    <PaginationRoot className="mt-8 flex-wrap gap-2 sm:mt-10">
-      <PaginationContent className="flex-wrap justify-center gap-2">
+    <PaginationRoot className="mt-8 sm:mt-10">
+      <PaginationContent>
         <PaginationItem>
           {page > 1 ? (
             <PaginationLink
               href={hrefFor(basePath, query, page - 1)}
               rel="prev"
               aria-label="Previous page"
-              className={`${cell} brutal-press`}
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </PaginationLink>
           ) : (
-            <span className={disabled} aria-hidden="true">
+            <span
+              className="flex h-9 w-9 items-center justify-center"
+              aria-hidden="true"
+            >
               <ChevronLeft className="h-4 w-4" />
             </span>
           )}
@@ -92,28 +89,19 @@ export function Pagination({
             <PaginationItem key={`gap-${index}`}>
               <span
                 aria-hidden="true"
-                className="px-1 font-display text-sm font-bold"
+                className="flex h-9 w-9 items-center justify-center"
               >
                 …
               </span>
             </PaginationItem>
-          ) : item === page ? (
-            <PaginationItem key={item}>
-              <PaginationLink
-                isActive
-                href={hrefFor(basePath, query, item)}
-                aria-label={`Page ${item}, current page`}
-                className={active}
-              >
-                {item}
-              </PaginationLink>
-            </PaginationItem>
           ) : (
             <PaginationItem key={item}>
               <PaginationLink
+                isActive={item === page}
                 href={hrefFor(basePath, query, item)}
-                aria-label={`Page ${item}`}
-                className={`${cell} brutal-press`}
+                aria-label={
+                  item === page ? `Page ${item}, current page` : `Page ${item}`
+                }
               >
                 {item}
               </PaginationLink>
@@ -127,12 +115,14 @@ export function Pagination({
               href={hrefFor(basePath, query, page + 1)}
               rel="next"
               aria-label="Next page"
-              className={`${cell} brutal-press`}
             >
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </PaginationLink>
           ) : (
-            <span className={disabled} aria-hidden="true">
+            <span
+              className="flex h-9 w-9 items-center justify-center"
+              aria-hidden="true"
+            >
               <ChevronRight className="h-4 w-4" />
             </span>
           )}

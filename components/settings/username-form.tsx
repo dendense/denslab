@@ -2,6 +2,10 @@
 
 import { Check, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 
 /**
@@ -50,14 +54,9 @@ export function UsernameForm({ initialName }: { initialName: string }) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-3">
-      <label
-        htmlFor="display-name"
-        className="block font-mono text-[10px] font-bold uppercase tracking-wide"
-      >
-        Display name
-      </label>
+      <Label htmlFor="display-name">Display name</Label>
 
-      <input
+      <Input
         id="display-name"
         name="display-name"
         type="text"
@@ -68,10 +67,9 @@ export function UsernameForm({ initialName }: { initialName: string }) {
         }}
         autoComplete="nickname"
         maxLength={40}
-        className="border-brutal w-full bg-canvas px-3 py-2 font-display text-sm font-bold sm:text-base"
       />
 
-      <p className="font-mono text-[11px] leading-relaxed">
+      <p className="text-muted-foreground text-sm">
         {tooShort
           ? "Use at least 2 characters."
           : tooLong
@@ -80,33 +78,23 @@ export function UsernameForm({ initialName }: { initialName: string }) {
       </p>
 
       <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="submit"
-          disabled={disabled}
-          aria-busy={pending}
-          className="border-brutal-thin inline-flex items-center gap-2 bg-accent px-4 py-2 font-display text-sm font-bold text-on-accent shadow-brutal-sm brutal-press disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {pending && (
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-          )}
+        <Button type="submit" disabled={disabled} aria-busy={pending}>
+          {pending && <Loader2 className="animate-spin" aria-hidden="true" />}
           Save name
-        </button>
+        </Button>
 
         {saved && (
-          <span
-            role="status"
-            className="border-brutal-thin inline-flex items-center gap-1.5 bg-canvas px-2.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-wide"
-          >
+          <Badge variant="secondary" role="status">
             <Check className="h-3.5 w-3.5" aria-hidden="true" />
             Saved
-          </span>
+          </Badge>
         )}
       </div>
 
       {error && (
         <p
           role="alert"
-          className="border-brutal-thin bg-canvas px-3 py-2 font-mono text-xs leading-relaxed"
+          className="bg-muted text-muted-foreground rounded-md px-3 py-2 text-sm"
         >
           {error}
         </p>

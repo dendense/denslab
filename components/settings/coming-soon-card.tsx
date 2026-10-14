@@ -4,8 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 
 /**
- * Placeholder card for features that are planned but not built. A dashed border
- * signals "not active yet" while staying inside the Neobrutalist palette.
+ * Placeholder card for features that are planned but not built.
  */
 export function ComingSoonCard({
   icon: Icon,
@@ -17,27 +16,25 @@ export function ComingSoonCard({
   description: string;
 }) {
   return (
-    <Card className="border-dashed p-4 sm:p-5">
+    <Card className="border-dashed p-6">
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
-          className="flex h-9 w-9 shrink-0 items-center justify-center border-brutal-thin bg-canvas"
+          className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-md"
         >
           <Icon className="h-4 w-4" />
         </span>
 
         <div className="min-w-0 space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-display text-base font-bold sm:text-lg">
-              {title}
-            </h3>
+            <h3 className="text-base font-semibold leading-none">{title}</h3>
             <Badge>
               <Lock className="h-3 w-3" aria-hidden="true" />
               Coming soon
             </Badge>
           </div>
 
-          <p className="font-mono text-xs leading-relaxed">{description}</p>
+          <p className="text-muted-foreground text-sm">{description}</p>
         </div>
       </div>
     </Card>

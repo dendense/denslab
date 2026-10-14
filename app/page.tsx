@@ -22,10 +22,10 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-14 lg:px-10">
       <header className="mb-8 max-w-2xl sm:mb-10">
-        <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+        <h1 className="text-3xl font-semibold tracking-tight leading-tight sm:text-4xl lg:text-5xl">
           Visual stories from the edge of reality &amp; imagination.
         </h1>
-        <p className="mt-3 font-mono text-xs leading-relaxed sm:mt-4 sm:text-sm">
+        <p className="text-muted-foreground mt-3 text-sm">
           {search
             ? `${total} ${total === 1 ? "result" : "results"} for “${search}”`
             : `${total} ${total === 1 ? "entry" : "entries"} — AI-generated work and photographs, with the prompt or the camera settings behind each one.`}
@@ -43,11 +43,11 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
       <section aria-label="Photo gallery">
         {search && posts.length === 0 ? (
-          <div className="border-brutal bg-canvas p-5 shadow-brutal-sm sm:p-6">
-            <p className="font-display text-base font-bold sm:text-lg">
+          <div className="bg-card text-card-foreground rounded-xl border p-5 shadow-sm sm:p-6">
+            <p className="text-lg font-semibold">
               Nothing matched “{search}”.
             </p>
-            <p className="mt-2 font-mono text-xs leading-relaxed sm:text-sm">
+            <p className="text-muted-foreground mt-2 text-sm">
               Try a shorter word, or search by tag such as “neon”, “night”, or
               “portrait”.
             </p>

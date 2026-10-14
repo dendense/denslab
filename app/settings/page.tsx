@@ -6,6 +6,8 @@ import { ComingSoonCard } from "@/components/settings/coming-soon-card";
 import { UsernameForm } from "@/components/settings/username-form";
 import { countBookmarks } from "@/lib/bookmarks";
 import { createClient } from "@/lib/supabase/server";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Settings",
@@ -46,27 +48,25 @@ export default async function SettingsPage() {
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
       <div className="mx-auto w-full max-w-3xl space-y-6 sm:space-y-8">
-        <header className="space-y-2 border-b-brutal pb-6">
-          <span className="border-brutal-thin inline-block bg-accent px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-on-accent sm:text-[11px]">
-            Account
-          </span>
-          <h1 className="font-display text-3xl font-bold leading-tight sm:text-4xl">
+        <header className="space-y-2 border-b border-border pb-6">
+          <Badge>Account</Badge>
+          <h1 className="text-3xl font-semibold tracking-tight leading-tight sm:text-4xl">
             Settings
           </h1>
-          <p className="font-mono text-xs leading-relaxed sm:text-sm">
+          <p className="text-muted-foreground text-sm">
             Signed in as {user.email ?? "your account"}.
           </p>
         </header>
 
-        <section className="border-brutal bg-canvas p-4 shadow-brutal-sm sm:p-6">
-          <h2 className="mb-4 font-display text-lg font-bold sm:text-xl">
+        <section className="bg-card text-card-foreground rounded-xl border p-4 shadow-sm sm:p-6">
+          <h2 className="mb-4 text-lg font-semibold sm:text-xl">
             Profile
           </h2>
           <UsernameForm initialName={displayNameOf(user)} />
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-lg font-bold sm:text-xl">
+          <h2 className="text-lg font-semibold sm:text-xl">
             Upcoming
           </h2>
 
@@ -76,31 +76,28 @@ export default async function SettingsPage() {
             description="Support the laboratory and unlock early access to new collections and higher-resolution downloads."
           />
 
-          <section className="border-brutal-thin bg-canvas p-4 sm:p-5">
+          <section className="bg-card text-card-foreground rounded-xl border p-6">
             <div className="flex items-start gap-3">
               <span
                 aria-hidden="true"
-                className="flex h-9 w-9 shrink-0 items-center justify-center border-brutal-thin bg-canvas"
+                className="bg-muted flex h-9 w-9 shrink-0 items-center justify-center rounded-md"
               >
                 <Bookmark className="h-4 w-4" />
               </span>
 
               <div className="min-w-0 space-y-1.5">
-                <h3 className="font-display text-base font-bold sm:text-lg">
+                <h3 className="text-lg font-semibold">
                   Bookmarks
                 </h3>
-                <p className="font-mono text-xs leading-relaxed">
+                <p className="text-muted-foreground text-sm">
                   {bookmarkCount === 0
                     ? "You have not saved any posts yet."
                     : `${bookmarkCount} ${bookmarkCount === 1 ? "post" : "posts"} saved privately.`}
                 </p>
 
-                <Link
-                  href="/bookmarks"
-                  className="border-brutal-thin mt-2 inline-flex items-center gap-1.5 bg-accent px-3 py-1.5 font-display text-xs font-bold text-on-accent shadow-brutal-sm brutal-press sm:text-sm"
-                >
-                  Open bookmarks
-                </Link>
+                <Button asChild size="sm" className="mt-2">
+                  <Link href="/bookmarks">Open bookmarks</Link>
+                </Button>
               </div>
             </div>
           </section>

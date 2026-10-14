@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 /**
@@ -40,21 +41,22 @@ export function GoogleSignInButton() {
 
   return (
     <div className="space-y-3">
-      <button
+      <Button
         type="button"
+        size="lg"
         onClick={signInWithGoogle}
         disabled={pending || !configured}
         aria-busy={pending}
-        className="border-brutal flex w-full items-center justify-center gap-2.5 bg-accent px-5 py-3 font-display text-base font-bold text-on-accent shadow-brutal brutal-press disabled:cursor-not-allowed disabled:opacity-60 sm:text-lg"
+        className="w-full"
       >
-        <GoogleMark className="h-5 w-5 shrink-0" />
+        <GoogleMark className="shrink-0" />
         {pending ? "Redirecting…" : "Login with Google"}
-      </button>
+      </Button>
 
       {!configured && (
         <p
           role="status"
-          className="border-brutal-thin bg-canvas px-3 py-2 font-mono text-xs leading-relaxed"
+          className="bg-muted text-muted-foreground rounded-md px-3 py-2 text-sm"
         >
           Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and
           NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local to enable sign-in.
@@ -64,7 +66,7 @@ export function GoogleSignInButton() {
       {error && (
         <p
           role="alert"
-          className="border-brutal-thin bg-canvas px-3 py-2 font-mono text-xs leading-relaxed"
+          className="bg-muted text-muted-foreground rounded-md px-3 py-2 text-sm"
         >
           {error}
         </p>

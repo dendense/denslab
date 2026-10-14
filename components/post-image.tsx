@@ -6,7 +6,7 @@ import { useState } from "react";
 import { imgurFullUrl, imgurThumbUrl } from "@/lib/posts";
 
 /**
- * Post image with a Neobrutalist fallback.
+ * Post image with a stand-in when the file is missing.
  *
  * Whether the Imgur id is valid is decided on the server and passed in as
  * `imageAvailable`. It cannot be decided here: Imgur sends no CORS headers, the
@@ -99,12 +99,10 @@ export function Placeholder({
       role="img"
       aria-label={`${alt} — image unavailable`}
       style={{ aspectRatio: ratio }}
-      className={`brutal-placeholder flex flex-col items-center justify-center gap-2 border-b-brutal bg-canvas p-4 text-center ${className}`}
+      className={`bg-muted text-muted-foreground flex flex-col items-center justify-center gap-2 p-4 text-center ${className}`}
     >
       <ImageOff className="h-6 w-6" aria-hidden="true" />
-      <span className="font-display text-xs font-bold uppercase tracking-wide sm:text-sm">
-        Image unavailable
-      </span>
+      <span className="text-sm">Image unavailable</span>
     </div>
   );
 }

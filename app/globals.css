@@ -14,17 +14,9 @@
 
 :root,
 [data-theme="light"] {
-  /* Premium light palette — dark canvas + neutral surface + single blue accent. */
-  --canvas: #fafafa;
-  --surface: #ffffff;
+  /* Premium light palette — near-white canvas + neutral surface + blue accent. */
   --foreground: #09090b;
-  --accent: #2563eb;
-  --on-accent: #ffffff;
-  --ink: #09090b;
-  --muted: #52525b;
-  /* Structural edge. zinc-500 clears 4.63:1 on #fafafa and 4.75:1 on #fffdf8,
-     so borders remain visible without becoming heavy. */
-  --edge: #71717a;
+  --accent: #f4f4f5;
 
   /* Discover Button tokens (kept under the obsidian prefix for compatibility
      with components/block/discover-button.css). */
@@ -39,7 +31,7 @@
    * so the premium palette stays the single source of truth. Denslab values win
    * over the shadcn reference table where the two disagree on brand:
    * `--primary` is the brand blue #2563eb, and `--primary-foreground` is
-   * `--on-accent` (5.17:1 on it) rather than shadcn's near-white.
+   * #ffffff (5.17:1 on it) rather than shadcn's near-white.
    */
   --background: #fafafa;
   --foreground: #09090b;
@@ -53,11 +45,6 @@
   --secondary-foreground: #09090b;
   --muted: #f4f4f5;
   --muted-foreground: #52525b;
-  /*
-   * `--accent` is deliberately NOT redeclared in the shadcn block below:
-   * denslab's own `--accent` (#2563eb) is set above and is what `bg-accent`
-   * must keep resolving to. Only `--accent-foreground` is shadcn's.
-   */
   --accent-foreground: #09090b;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
@@ -69,16 +56,8 @@
 
 [data-theme="dark"] {
   /* Premium dark palette — near-black canvas + zinc surface + brighter blue. */
-  --canvas: #09090b;
-  --surface: #18181b;
   --foreground: #fafafa;
-  --accent: #3b82f6;
-  /* Dark-on-blue: #0b1220 on #3b82f6 is 5.09:1. */
-  --on-accent: #0b1220;
-  --ink: #fafafa;
-  --muted: #a1a1aa;
-  /* Same structural edge: 4.12:1 on the card surface #09090b. */
-  --edge: #71717a;
+  --accent: #27272a;
 
   --obsidian-discover-surface: rgb(24 24 27 / 85%);
   --obsidian-discover-text: #fafafa;
@@ -104,12 +83,6 @@
   --secondary-foreground: #fafafa;
   --muted: #27272a;
   --muted-foreground: #a1a1aa;
-  /*
-   * `--accent` is deliberately NOT redeclared here. denslab's own `--accent`
-   * (#3b82f6, denslab blue) is set earlier in this block and is what the
-   * existing `bg-accent` / `text-accent` utilities must keep resolving to.
-   * Only `--accent-foreground` comes from shadcn.
-   */
   --accent-foreground: #fafafa;
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
@@ -135,6 +108,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
@@ -146,111 +120,14 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-
-  /* Denslab palette exposed to Tailwind utilities. */
-  --color-canvas: var(--canvas);
-  --color-ink: var(--ink);
-  --color-on-accent: var(--on-accent);
-  --color-edge: var(--edge);
-  --color-accent: var(--accent);
-  --color-foreground: var(--foreground);
-
-  /* Typography */
-  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
-
-  /* Layered soft shadows replace the hard offset ones everywhere. */
-  --shadow-brutal-sm: 0 1px 2px rgb(9 9 11 / 6%), 0 8px 24px -10px rgb(9 9 11 / 18%);
-  --shadow-brutal: 0 2px 4px rgb(9 9 11 / 8%), 0 18px 40px -12px rgb(9 9 11 / 28%);
-  --shadow-brutal-lg: 0 4px 8px rgb(9 9 11 / 10%), 0 28px 60px -16px rgb(9 9 11 / 30%);
-  --shadow-brutal-press: 0 1px 2px rgb(9 9 11 / 6%), 0 6px 16px -8px rgb(9 9 11 / 22%);
-  --shadow-brutal-hover: 0 2px 4px rgb(9 9 11 / 8%), 0 18px 40px -12px rgb(9 9 11 / 28%);
-
-  /* shadcn token shadow — soft by design (never the Neobrutalist hard offset),
-     so components added later can carry a premium shadow without a custom class. */
-  --shadow-shadcn: 0 2px 4px rgb(9 9 11 / 8%), 0 18px 40px -12px rgb(9 9 11 / 28%);
-
-  /* Premium radius (was 0px in the Neobrutalist phase). */
-  --radius-brutal: 12px;
-}
-
-/* Dark-mode shadow overrides so layered shadows stay dark on dark surfaces. */
-[data-theme="dark"] {
-  --shadow-brutal-sm: 0 1px 2px rgb(0 0 0 / 50%), 0 16px 40px -14px rgb(0 0 0 / 70%);
-  --shadow-brutal: 0 2px 4px rgb(0 0 0 / 55%), 0 24px 52px -16px rgb(0 0 0 / 80%);
-  --shadow-brutal-lg: 0 4px 8px rgb(0 0 0 / 60%), 0 32px 64px -18px rgb(0 0 0 / 85%);
-  --shadow-brutal-press: 0 1px 2px rgb(0 0 0 / 55%), 0 6px 16px -8px rgb(0 0 0 / 70%);
-  --shadow-brutal-hover: 0 2px 6px rgb(0 0 0 / 55%), 0 24px 52px -16px rgb(0 0 0 / 80%);
-}
-
-@utility border-brutal {
-  border-width: 3px;
-  border-style: solid;
-  border-color: var(--edge);
-  border-radius: var(--radius-brutal);
-}
-
-@utility border-brutal-thin {
-  border-width: 2px;
-  border-style: solid;
-  border-color: var(--edge);
-  border-radius: calc(var(--radius-brutal) - 2px);
 }
 
 /*
- * Accent-filled pills (Details pill, category Badge, Search button, active
- * pagination cell) carry `bg-accent`, so their border must clear 3:1 against
- * the ACCENT fill, not the page — the neutral edge only reaches 1.07:1
- * (light) / 1.31:1 (dark) there. `--on-accent` is the token already chosen to
- * sit on the accent (white on #2563eb = 5.17:1; #0b1220 on #3b82f6 = 5.09:1),
- * and it keeps the pill outline the same colour as its label.
- */
-.bg-accent.border-brutal,
-.bg-accent.border-brutal-thin {
-  border-color: var(--on-accent);
-}
-
-/* Premium hover: a subtle lift instead of the Neobrutalist shadow collapse. */
-@utility brutal-press {
-  transition:
-    box-shadow 160ms ease-out,
-    transform 160ms ease-out;
-
-  &:hover {
-    box-shadow: var(--shadow-brutal-hover);
-    transform: translateY(-2px);
-  }
-}
-
-/* Static hover feedback for elements that must not move (e.g. photo cards). */
-@utility brutal-flat-hover {
-  transition: border-color 120ms ease-out;
-
-  &:hover {
-    border-color: var(--accent);
-  }
-}
-
-/*
- * Quiet hover: opacity fade only, no shadow collapse or movement. Used for
- * low-emphasis actions such as Sign out.
- */
-@utility brutal-fade {
-  transition: opacity 160ms ease-out;
-
-  &:hover {
-    opacity: 0.65;
-  }
-}
-
-/*
- * Reduced motion. The two utilities below move by design (the skeleton slides,
- * the press shadow collapses with a 3px nudge), and Tailwind's own `animate-spin`
- * is used for every pending spinner, so a blanket rule is the only way to catch
- * all of them plus anything added later. It is unlayered on purpose: unlayered
- * declarations outrank `@layer utilities`, which is what lets it win over the
- * utilities without an `!important` arms race.
+ * Reduced motion. Tailwind's `animate-pulse` (shadcn Skeleton), every spinner,
+ * and all transition-based hovers move by design, so a blanket rule is the only
+ * way to catch all of them plus anything added later. It is unlayered on
+ * purpose: unlayered declarations outrank `@layer utilities`, which is what
+ * lets it win over the utilities without an `!important` arms race.
  */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -261,51 +138,6 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-
-  .brutal-skeleton {
-    animation: none;
-  }
-
-  .brutal-fade {
-    transition: none;
-  }
-
-  /* Keep the lift as static shadow feedback, drop the movement. */
-  .brutal-press:hover {
-    transform: none;
-  }
-}
-
-/* Flat moving stripes so the skeleton reads as "loading" without a spinner. */
-@utility brutal-skeleton {
-  background-image: repeating-linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--accent) 55%, transparent) 0 12px,
-    transparent 12px 24px
-  );
-  background-size: 200% 100%;
-  animation: brutal-skeleton-slide 1.2s linear infinite;
-}
-
-@keyframes brutal-skeleton-slide {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: -200% 0;
-  }
-}
-
-/*
- * Stand-in for a post image that cannot be shown. The diagonal hatch marks it
- * as deliberately empty rather than broken, using only palette colours.
- */
-@utility brutal-placeholder {
-  background-image: repeating-linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--edge) 12%, transparent) 0 8px,
-    transparent 8px 16px
-  );
 }
 
 @layer base {
@@ -321,22 +153,11 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
-  }
-
-  /* Headings: tighter tracking for a premium editorial feel. */
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    letter-spacing: -0.02em;
   }
 
   ::selection {
-    background-color: var(--accent);
-    color: var(--on-accent);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
   }
 
   /*
@@ -352,12 +173,12 @@
 
   /*
    * Focus ring stays visible in both themes. The ring is drawn outside the
-   * element (offset 2px), so it sits on `--canvas` and has to clear 3:1
-   * against that surface. `--ink` does in both: #09090b on the light canvas
-   * is 20.66:1, #fafafa on the dark canvas is 17.43:1.
+   * element (offset 2px), so it sits on the page background and has to clear
+   * 3:1 against that surface. `--ring` does in both: #2563eb on #fafafa is
+   * 4.63:1, #3b82f6 on #09090b is 5.02:1.
    */
   :focus-visible {
-    outline: 3px solid var(--ink);
+    outline: 3px solid var(--ring);
     outline-offset: 2px;
   }
 }

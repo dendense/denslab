@@ -55,13 +55,9 @@ export function ThemeToggle() {
       title={label}
       aria-label={label}
       aria-pressed={theme === "dark"}
-      className="border-brutal-thin h-9 w-9 rounded-none bg-accent text-on-accent shadow-none outline-offset-2 hover:bg-accent focus-visible:outline-[3px] focus-visible:outline-ink brutal-press sm:h-10 sm:w-10"
     >
-      <Sun className="h-4 w-4 dark:hidden sm:h-[18px] sm:w-[18px]" aria-hidden="true" />
-      <Moon
-        className="hidden h-4 w-4 dark:block sm:h-[18px] sm:w-[18px]"
-        aria-hidden="true"
-      />
+      <Sun className="h-4 w-4 dark:hidden" aria-hidden="true" />
+      <Moon className="hidden h-4 w-4 dark:block" aria-hidden="true" />
     </Button>
   );
 }

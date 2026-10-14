@@ -3,6 +3,8 @@
 import { Check, Copy, ExternalLink, Heart } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -49,40 +51,35 @@ const OPTIONS = [
 export function DonateButton() {
   return (
     <Dialog>
-      <DialogTrigger className="border-brutal-thin inline-flex items-center gap-2 px-3 py-1.5 font-display text-sm font-bold brutal-press">
-        <Heart className="h-4 w-4" aria-hidden="true" />
-        Donate
+      <DialogTrigger asChild>
+        <Button variant="outline">
+          <Heart aria-hidden="true" />
+          Donate
+        </Button>
       </DialogTrigger>
 
-      <DialogContent className="border-brutal max-h-[90vh] w-full max-w-3xl overflow-y-auto bg-canvas p-5 text-ink shadow-brutal-lg sm:rounded-none sm:p-6">
-        <DialogHeader className="mb-5 flex-row items-start justify-between gap-4 space-y-0 border-b-brutal pb-4 text-left">
-          <div className="space-y-1">
-            <DialogTitle className="font-display text-xl font-bold sm:text-2xl">
-              Support denslab
-            </DialogTitle>
-            <DialogDescription className="font-mono text-xs leading-relaxed sm:text-sm">
-              Every contribution keeps the laboratory running. Thank you.
-            </DialogDescription>
-          </div>
+      <DialogContent className="max-h-[90vh] w-full max-w-3xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Support denslab</DialogTitle>
+          <DialogDescription>
+            Every contribution keeps the laboratory running. Thank you.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
           {OPTIONS.map((option) => (
-            <section
-              key={option.id}
-              className="border-brutal-thin flex flex-col bg-canvas"
-            >
-              <div className="border-b-brutal-thin px-3 py-2">
-                <h3 className="font-display text-base font-bold">
+            <Card key={option.id} className="flex flex-col">
+              <div className="space-y-1 p-4">
+                <h3 className="text-base font-semibold leading-none">
                   {option.label}
                 </h3>
-                <p className="font-mono text-[11px] uppercase tracking-wide">
+                <p className="text-muted-foreground text-sm">
                   {option.caption}
                 </p>
               </div>
 
-              <div className="p-3">
-                <div className="border-brutal bg-white">
+              <div className="px-4">
+                <div className="rounded-md border bg-white">
                   <Image
                     src={option.image}
                     alt={option.alt}
@@ -95,18 +92,18 @@ export function DonateButton() {
               </div>
 
               {option.address && (
-                <div className="mt-auto border-t-brutal-thin p-3">
-                  <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-wide">
+                <div className="mt-auto space-y-2 p-4">
+                  <p className="text-sm font-medium leading-none">
                     Wallet address
                   </p>
                   <AddressField address={option.address} />
                 </div>
               )}
-            </section>
+            </Card>
           ))}
         </div>
 
-        <p className="mt-5 border-t-brutal-thin pt-4 font-mono text-[11px] leading-relaxed">
+        <p className="text-muted-foreground text-sm">
           Only send USDT on the TRC20 network to the address above. Funds sent on
           another network cannot be recovered.
         </p>
@@ -131,35 +128,32 @@ function AddressField({ address }: { address: string }) {
 
   return (
     <div className="space-y-3">
-      <code className="border-brutal-thin block break-all bg-canvas px-2 py-1.5 font-mono text-[11px] leading-relaxed">
+      <code className="bg-muted block break-all rounded-md px-2 py-1.5 font-mono text-xs leading-relaxed">
         {address}
       </code>
 
       {/* Controls sit side by side with an explicit gap so the link is never
           flush against the button. */}
       <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={copy}
-          className="border-brutal-thin inline-flex items-center gap-1.5 px-2.5 py-1.5 font-display text-xs font-bold brutal-press"
-        >
+        <Button type="button" variant="outline" size="sm" onClick={copy}>
           {copied ? (
-            <Check className="h-3.5 w-3.5" aria-hidden="true" />
+            <Check aria-hidden="true" />
           ) : (
-            <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+            <Copy aria-hidden="true" />
           )}
           {copied ? "Copied" : "Copy address"}
-        </button>
+        </Button>
 
-        <a
-          href={`https://tronscan.org/#/address/${address}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="border-brutal-thin inline-flex items-center gap-1.5 px-2.5 py-1.5 font-display text-xs font-bold brutal-press"
-        >
-          View on Tronscan
-          <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-        </a>
+        <Button asChild variant="outline" size="sm">
+          <a
+            href={`https://tronscan.org/#/address/${address}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View on Tronscan
+            <ExternalLink aria-hidden="true" />
+          </a>
+        </Button>
       </div>
     </div>
   );

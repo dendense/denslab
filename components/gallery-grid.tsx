@@ -16,7 +16,7 @@ export function GalleryGrid({ posts }: { posts: PostCardData[] }) {
 
   if (posts.length === 0) {
     return (
-      <p className="border-brutal bg-canvas px-4 py-6 font-mono text-sm shadow-brutal-sm">
+      <p className="bg-muted text-muted-foreground rounded-md px-4 py-6 text-sm">
         No posts here yet.
       </p>
     );

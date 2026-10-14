@@ -3,6 +3,14 @@
 import { Check, Copy, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import type { AiMetadata, PhotoMetadata, Post } from "@/lib/posts";
 
 const AI_FIELDS: { key: keyof AiMetadata; label: string }[] = [
@@ -57,61 +65,45 @@ export function PromptPanel({
   }
 
   return (
-    <section
-      aria-labelledby="details-heading"
-      className="border-brutal bg-canvas shadow-brutal-sm"
-    >
-      <header className="flex items-center justify-between gap-3 border-b-brutal px-4 py-3 sm:px-5">
-        <h2
-          id="details-heading"
-          className="font-display text-base font-bold sm:text-lg"
-        >
-          {heading}
-        </h2>
+    <Card aria-labelledby="details-heading">
+      <CardHeader className="flex-row items-center justify-between space-y-0">
+        <CardTitle id="details-heading">{heading}</CardTitle>
 
         {!isAuthenticated ? (
-          <span className="border-brutal-thin flex shrink-0 items-center gap-1 bg-canvas px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wide">
+          <Badge variant="secondary" className="shrink-0">
             <Lock className="h-3 w-3" aria-hidden="true" />
             Locked
-          </span>
+          </Badge>
         ) : isAi ? (
-          <button
-            type="button"
-            onClick={copyPrompt}
-            className="border-brutal-thin flex shrink-0 items-center gap-1.5 bg-accent px-2.5 py-1.5 font-display text-xs font-bold text-on-accent brutal-press sm:px-3 sm:text-sm"
-          >
+          <Button type="button" size="sm" onClick={copyPrompt} className="shrink-0">
             {copied ? (
-              <Check className="h-3.5 w-3.5" aria-hidden="true" />
+              <Check aria-hidden="true" />
             ) : (
-              <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+              <Copy aria-hidden="true" />
             )}
             {copied ? "Copied" : "Copy Prompt"}
-          </button>
+          </Button>
         ) : null}
-      </header>
+      </CardHeader>
 
-      <div className="relative">
+      <CardContent className="relative">
         <div
           aria-hidden={!isAuthenticated}
-          className={`space-y-4 p-4 sm:p-5 ${
+          className={`space-y-4 ${
             isAuthenticated ? "" : "select-none blur-[6px]"
           }`}
         >
           {isAi && (
             <>
               <div className="space-y-1.5">
-                <p className="font-mono text-[10px] font-bold uppercase tracking-wide">
-                  Positive prompt
-                </p>
+                <p className="text-sm font-medium leading-none">Positive prompt</p>
                 <p className="break-words font-mono text-xs leading-relaxed">
                   {post.metadata.prompt}
                 </p>
               </div>
 
               <div className="space-y-1.5">
-                <p className="font-mono text-[10px] font-bold uppercase tracking-wide">
-                  Negative prompt
-                </p>
+                <p className="text-sm font-medium leading-none">Negative prompt</p>
                 <p className="break-words font-mono text-xs leading-relaxed">
                   {post.metadata.negativePrompt || "—"}
                 </p>
@@ -122,9 +114,7 @@ export function PromptPanel({
           <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {(isAi ? AI_FIELDS : PHOTO_FIELDS).map(({ key, label }) => (
               <div key={key} className="space-y-1">
-                <dt className="font-mono text-[10px] font-bold uppercase tracking-wide">
-                  {label}
-                </dt>
+                <dt className="text-sm font-medium leading-none">{label}</dt>
                 <dd className="break-all font-mono text-xs">
                   {isAi
                     ? String(post.metadata[key as keyof AiMetadata])
@@ -138,20 +128,17 @@ export function PromptPanel({
         </div>
 
         {!isAuthenticated && (
-          <div className="border-t-brutal absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 bg-canvas p-5 text-center sm:p-6">
-            <p className="max-w-xs font-display text-sm font-bold sm:text-base">
-              {cta}
-            </p>
-            <Link
-              href="/login"
-              className="border-brutal-thin inline-flex items-center gap-2 bg-accent px-4 py-2 font-display text-sm font-bold text-on-accent shadow-brutal-sm brutal-press"
-            >
-              <Lock className="h-3.5 w-3.5" aria-hidden="true" />
-              {ctaButton}
-            </Link>
+          <div className="bg-background absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 border-t p-5 text-center sm:p-6">
+            <p className="max-w-xs text-sm font-medium sm:text-base">{cta}</p>
+            <Button asChild>
+              <Link href="/login">
+                <Lock aria-hidden="true" />
+                {ctaButton}
+              </Link>
+            </Button>
           </div>
         )}
-      </div>
-    </section>
+      </CardContent>
+    </Card>
   );
 }

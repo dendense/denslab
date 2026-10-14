@@ -31,11 +31,11 @@ function initialCategory(post?: Post): Category {
   return post?.category ?? "AI Generated";
 }
 
-const inputClass =
-  "border-brutal-thin h-auto w-full rounded-none bg-canvas px-3 py-2 font-mono text-sm shadow-none focus-visible:ring-0";
+const inputClass = "w-full";
+const textareaClass =
+  "border-input placeholder:text-muted-foreground focus-visible:ring-ring flex w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50";
 
-const labelClass =
-  "mb-1 block font-mono text-[10px] font-bold uppercase tracking-wide";
+const labelClass = "mb-1 block";
 
 export function PostForm({
   post,
@@ -74,10 +74,8 @@ export function PostForm({
 
   return (
     <form action={onSubmit} className="space-y-5">
-      <fieldset className="border-brutal bg-canvas p-4 sm:p-5">
-        <legend className="px-1 font-display text-sm font-bold uppercase tracking-wide">
-          Category
-        </legend>
+      <fieldset className="bg-muted/40 rounded-lg border p-4 sm:p-5">
+        <legend className="px-1 text-sm font-medium">Category</legend>
 
         <RadioGroup
           name="category"
@@ -91,8 +89,8 @@ export function PostForm({
               <Label
                 key={option}
                 htmlFor={`category-${option}`}
-                className={`border-brutal-thin cursor-pointer rounded-none px-4 py-2 font-display text-sm font-bold brutal-press ${
-                  active ? "bg-accent text-on-accent" : "bg-canvas"
+                className={`cursor-pointer rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+                  active ? "bg-primary text-primary-foreground" : "bg-background"
                 }`}
               >
                 <RadioGroupItem
@@ -130,7 +128,7 @@ export function PostForm({
             name="description"
             rows={3}
             defaultValue={post?.description ?? ""}
-            className={inputClass}
+            className={textareaClass}
           />
         </div>
 
@@ -190,10 +188,8 @@ export function PostForm({
       </div>
 
       {category === "AI Generated" ? (
-        <fieldset className="border-brutal bg-canvas p-4 sm:p-5">
-          <legend className="px-1 font-display text-sm font-bold uppercase tracking-wide">
-            AI Metadata
-          </legend>
+        <fieldset className="bg-muted/40 rounded-lg border p-4 sm:p-5">
+          <legend className="px-1 text-sm font-medium">AI Metadata</legend>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
@@ -205,7 +201,7 @@ export function PostForm({
                 name="prompt"
                 rows={3}
                 defaultValue={ai.prompt}
-                className={inputClass}
+                className={textareaClass}
               />
             </div>
 
@@ -218,7 +214,7 @@ export function PostForm({
                 name="negativePrompt"
                 rows={2}
                 defaultValue={ai.negativePrompt}
-                className={inputClass}
+                className={textareaClass}
               />
             </div>
 
@@ -261,10 +257,8 @@ export function PostForm({
           </div>
         </fieldset>
       ) : (
-        <fieldset className="border-brutal bg-canvas p-4 sm:p-5">
-          <legend className="px-1 font-display text-sm font-bold uppercase tracking-wide">
-            Camera
-          </legend>
+        <fieldset className="bg-muted/40 rounded-lg border p-4 sm:p-5">
+          <legend className="px-1 text-sm font-medium">Camera</legend>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
@@ -337,7 +331,7 @@ export function PostForm({
       {error && (
         <p
           role="alert"
-          className="border-brutal-thin bg-canvas px-3 py-2 font-mono text-xs leading-relaxed"
+          className="bg-muted text-muted-foreground rounded-md px-3 py-2 text-sm"
         >
           {error}
         </p>
@@ -348,7 +342,7 @@ export function PostForm({
           type="submit"
           disabled={pending}
           aria-busy={pending}
-          className="border-brutal-thin h-auto gap-2 rounded-none bg-accent px-4 py-2 font-display text-sm font-bold text-on-accent shadow-brutal-sm brutal-press hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+          
         >
           {pending && (
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -360,7 +354,7 @@ export function PostForm({
           type="button"
           variant="outline"
           onClick={onCancel}
-          className="border-brutal-thin h-auto rounded-none bg-canvas px-4 py-2 font-display text-sm font-bold shadow-none brutal-press hover:bg-canvas"
+          
         >
           Cancel
         </Button>

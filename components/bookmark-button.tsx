@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toggleBookmark } from "@/app/bookmarks/actions";
+import { Button } from "@/components/ui/button";
 
 /**
  * Bookmark control for the detail page.
@@ -29,13 +30,12 @@ export function BookmarkButton({
 
   if (!isAuthenticated) {
     return (
-      <Link
-        href="/login"
-        className="border-brutal-thin inline-flex items-center gap-2 px-3 py-1.5 font-display text-sm font-bold brutal-press"
-      >
-        <Bookmark className="h-4 w-4" aria-hidden="true" />
-        Save to bookmarks
-      </Link>
+      <Button asChild variant="outline">
+        <Link href="/login">
+          <Bookmark aria-hidden="true" />
+          Save to bookmarks
+        </Link>
+      </Button>
     );
   }
 
@@ -63,30 +63,27 @@ export function BookmarkButton({
 
   return (
     <div className="space-y-2">
-      <button
+      <Button
         type="button"
+        variant={bookmarked ? "default" : "outline"}
         onClick={onClick}
         disabled={pending}
         aria-pressed={bookmarked}
         title={bookmarked ? "Remove from bookmarks" : "Save to bookmarks"}
-        className={`border-brutal-thin inline-flex items-center gap-2 px-3 py-1.5 font-display text-sm font-bold brutal-press disabled:cursor-not-allowed disabled:opacity-60 ${
-          bookmarked ? "bg-accent text-on-accent" : "bg-canvas"
-        }`}
       >
         {pending ? (
-          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+          <Loader2 className="animate-spin" aria-hidden="true" />
         ) : (
           <Bookmark
-            className="h-4 w-4"
             fill={bookmarked ? "currentColor" : "none"}
             aria-hidden="true"
           />
         )}
         {bookmarked ? "Saved" : "Save"}
-      </button>
+      </Button>
 
       {error && (
-        <p role="alert" className="font-mono text-xs">
+        <p role="alert" className="text-xs">
           {error}
         </p>
       )}
