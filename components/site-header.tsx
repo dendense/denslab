@@ -1,12 +1,21 @@
 "use client";
 
-import { Bookmark, Menu, ShieldCheck, X } from "lucide-react";
+import { Bookmark, Menu, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { createClient } from "@/lib/supabase/client";
 import { shortenUsername } from "@/lib/format-username";
+import { useEffect } from "react";
 
 const aboutLink = { href: "/about", label: "About" };
 
@@ -104,32 +113,85 @@ function useSessionUser() {
   return user;
 }
 
+/** Nav item shared by the desktop row and the mobile drawer. */
+const navLink = "border-brutal-thin font-display text-base font-bold";
+
 export function SiteHeader() {
   const pathname = usePathname();
   const user = useSessionUser();
-  // Panel closes on navigation without an effect: state records which path the
-  // panel was opened on, and a different pathname renders it closed.
-  const [openedOn, setOpenedOn] = useState<string | null>(null);
-  const open = openedOn === pathname;
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  function togglePanel() {
-    setOpenedOn(open ? null : pathname);
-  }
-
-  function closePanel() {
-    setOpenedOn(null);
-  }
-
-  useEffect(() => {
-    if (!open) return;
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpenedOn(null);
-    }
-
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [open]);
+  const items = (
+    <>
+      <li>
+        <Link
+          href={categoryLink.href}
+          aria-current={pathname.startsWith(categoryLink.href) ? "page" : undefined}
+          className={`${navLink} block px-4 py-1.5 brutal-press ${
+            pathname.startsWith(categoryLink.href) ? "bg-accent text-on-accent" : ""
+          }`}
+        >
+          {categoryLink.label}
+        </Link>
+      </li>
+      <li>
+        <Link
+          href={aboutLink.href}
+          aria-current={pathname === aboutLink.href ? "page" : undefined}
+          className={`${navLink} block px-4 py-1.5 brutal-press ${
+            pathname === aboutLink.href ? "bg-accent text-on-accent" : ""
+          }`}
+        >
+          {aboutLink.label}
+        </Link>
+      </li>
+      {user && (
+        <li>
+          <Link
+            href="/bookmarks"
+            aria-current={pathname === "/bookmarks" ? "page" : undefined}
+            className={`${navLink} flex items-center gap-1.5 px-4 py-1.5 brutal-press ${
+              pathname === "/bookmarks" ? "bg-accent text-on-accent" : ""
+            }`}
+          >
+            <Bookmark className="h-4 w-4" aria-hidden="true" />
+            Saved
+          </Link>
+        </li>
+      )}
+      {user?.isAdmin && (
+        <li>
+          <Link
+            href="/admin"
+            aria-current={pathname.startsWith("/admin") ? "page" : undefined}
+            className={`${navLink} flex items-center gap-1.5 px-4 py-1.5 brutal-press ${
+              pathname.startsWith("/admin") ? "bg-accent text-on-accent" : ""
+            }`}
+          >
+            <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+            Admin
+          </Link>
+        </li>
+      )}
+      <li>
+        {user ? (
+          <AccountMenu user={user} />
+        ) : (
+          <Button
+            asChild
+            className="border-brutal-thin h-auto rounded-none bg-accent px-4 py-1.5 font-display text-base font-bold text-on-accent shadow-none brutal-press hover:bg-accent"
+          >
+            <Link href="/login">Login</Link>
+          </Button>
+        )}
+      </li>
+      {/* The mobile drawer already carries its own toggle in the trigger row,
+          so this one is desktop-only to avoid rendering two. */}
+      <li className="hidden md:block">
+        <ThemeToggle />
+      </li>
+    </>
+  );
 
   return (
     <header className="sticky top-0 z-40 border-b-brutal bg-canvas">
@@ -145,178 +207,43 @@ export function SiteHeader() {
         </Link>
 
         {/* Desktop navigation */}
-        <ul className="hidden items-center gap-2 md:flex lg:gap-3">
-          <li>
-            <Link
-              href={categoryLink.href}
-              aria-current={
-                pathname.startsWith(categoryLink.href) ? "page" : undefined
-              }
-              className={`border-brutal-thin block px-4 py-1.5 font-display text-base font-bold brutal-press ${
-                pathname.startsWith(categoryLink.href)
-                  ? "bg-accent text-on-accent"
-                  : ""
-              }`}
-            >
-              {categoryLink.label}
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={aboutLink.href}
-              aria-current={pathname === aboutLink.href ? "page" : undefined}
-              className={`border-brutal-thin block px-4 py-1.5 font-display text-base font-bold brutal-press ${
-                pathname === aboutLink.href ? "bg-accent text-on-accent" : ""
-              }`}
-            >
-              {aboutLink.label}
-            </Link>
-          </li>
-          {user && (
-            <li>
-              <Link
-                href="/bookmarks"
-                aria-current={pathname === "/bookmarks" ? "page" : undefined}
-                className={`border-brutal-thin flex items-center gap-1.5 px-4 py-1.5 font-display text-base font-bold brutal-press ${
-                  pathname === "/bookmarks" ? "bg-accent text-on-accent" : ""
-                }`}
-              >
-                <Bookmark className="h-4 w-4" aria-hidden="true" />
-                Saved
-              </Link>
-            </li>
-          )}
-          {user?.isAdmin && (
-            <li>
-              <Link
-                href="/admin"
-                aria-current={pathname.startsWith("/admin") ? "page" : undefined}
-                className={`border-brutal-thin flex items-center gap-1.5 px-4 py-1.5 font-display text-base font-bold brutal-press ${
-                  pathname.startsWith("/admin") ? "bg-accent text-on-accent" : ""
-                }`}
-              >
-                <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-                Admin
-              </Link>
-            </li>
-          )}
-          <li>
-            {user ? (
-              <AccountMenu user={user} onNavigate={closePanel} />
-            ) : (
-              <Link
-                href="/login"
-                className="border-brutal-thin block bg-accent px-4 py-1.5 font-display text-base font-bold text-on-accent brutal-press"
-              >
-                Login
-              </Link>
-            )}
-          </li>
-          <li>
-            <ThemeToggle />
-          </li>
-        </ul>
+        <ul className="hidden items-center gap-2 md:flex lg:gap-3">{items}</ul>
 
         {/* Mobile trigger. Theme toggle stays reachable without opening the menu. */}
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
-          <button
-            type="button"
-            onClick={togglePanel}
-            aria-expanded={open}
-            aria-controls="mobile-nav-panel"
-            aria-label={open ? "Close menu" : "Open menu"}
-            className="border-brutal-thin flex h-9 w-9 items-center justify-center bg-canvas text-ink brutal-press sm:h-10 sm:w-10"
-          >
-            {open ? (
-              <X className="h-5 w-5" aria-hidden="true" />
-            ) : (
-              <Menu className="h-5 w-5" aria-hidden="true" />
-            )}
-          </button>
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                aria-label="Open menu"
+                className="border-brutal-thin h-9 w-9 rounded-none bg-canvas text-ink shadow-none brutal-press hover:bg-canvas sm:h-10 sm:w-10"
+              >
+                <Menu className="h-5 w-5" aria-hidden="true" />
+              </Button>
+            </SheetTrigger>
+
+            <SheetContent
+              side="right"
+              className="border-l-brutal w-72 bg-canvas text-ink sm:max-w-xs"
+            >
+              <SheetHeader className="border-b-brutal">
+                <SheetTitle className="font-display text-base font-bold uppercase tracking-wide">
+                  Menu
+                </SheetTitle>
+              </SheetHeader>
+
+              <ul
+                className="flex flex-col gap-2 px-4 pb-4"
+                onClick={() => setMobileOpen(false)}
+              >
+                {items}
+              </ul>
+            </SheetContent>
+          </Sheet>
         </div>
       </nav>
-
-      {/* Collapsible panel: shows only below `md`. */}
-      <div
-        id="mobile-nav-panel"
-        hidden={!open}
-        className="border-t-brutal bg-canvas md:hidden"
-      >
-        <ul className="flex flex-col gap-2 px-4 py-4 sm:px-6">
-          <li>
-            <Link
-              href={categoryLink.href}
-              onClick={closePanel}
-              aria-current={
-                pathname.startsWith(categoryLink.href) ? "page" : undefined
-              }
-              className={`border-brutal-thin block w-full px-4 py-2.5 font-display text-base font-bold brutal-press ${
-                pathname.startsWith(categoryLink.href)
-                  ? "bg-accent text-on-accent"
-                  : ""
-              }`}
-            >
-              {categoryLink.label}
-            </Link>
-          </li>
-          <li>
-            <Link
-              href={aboutLink.href}
-              onClick={closePanel}
-              aria-current={pathname === aboutLink.href ? "page" : undefined}
-              className={`border-brutal-thin block w-full px-4 py-2.5 font-display text-base font-bold brutal-press ${
-                pathname === aboutLink.href ? "bg-accent text-on-accent" : ""
-              }`}
-            >
-              {aboutLink.label}
-            </Link>
-          </li>
-          {user && (
-            <li>
-              <Link
-                href="/bookmarks"
-                onClick={closePanel}
-                aria-current={pathname === "/bookmarks" ? "page" : undefined}
-                className={`border-brutal-thin flex w-full items-center gap-2 px-4 py-2.5 font-display text-base font-bold brutal-press ${
-                  pathname === "/bookmarks" ? "bg-accent text-on-accent" : ""
-                }`}
-              >
-                <Bookmark className="h-4 w-4" aria-hidden="true" />
-                Saved
-              </Link>
-            </li>
-          )}
-          {user?.isAdmin && (
-            <li>
-              <Link
-                href="/admin"
-                onClick={closePanel}
-                aria-current={pathname.startsWith("/admin") ? "page" : undefined}
-                className={`border-brutal-thin flex w-full items-center gap-2 px-4 py-2.5 font-display text-base font-bold brutal-press ${
-                  pathname.startsWith("/admin") ? "bg-accent text-on-accent" : ""
-                }`}
-              >
-                <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-                Admin
-              </Link>
-            </li>
-          )}
-          <li>
-            {user ? (
-              <AccountMenu user={user} onNavigate={closePanel} />
-            ) : (
-              <Link
-                href="/login"
-                onClick={closePanel}
-                className="border-brutal-thin block w-full bg-accent px-4 py-2.5 font-display text-base font-bold text-on-accent brutal-press"
-              >
-                Login
-              </Link>
-            )}
-          </li>
-        </ul>
-      </div>
     </header>
   );
 }
@@ -326,20 +253,13 @@ export function SiteHeader() {
  * out button. A plain form POST to /auth/signout keeps sign-out working
  * without an extra client component.
  */
-function AccountMenu({
-  user,
-  onNavigate,
-}: {
-  user: SessionUser;
-  onNavigate: () => void;
-}) {
+function AccountMenu({ user }: { user: SessionUser }) {
   const onSettings = usePathname() === "/settings";
 
   return (
     <div className="border-brutal-thin flex items-center gap-2 bg-canvas px-2 py-1.5">
       <Link
         href="/settings"
-        onClick={onNavigate}
         title={user.displayName}
         aria-current={onSettings ? "page" : undefined}
         className="max-w-[6rem] truncate font-display text-sm font-bold underline-offset-4 brutal-fade hover:underline"
@@ -350,7 +270,6 @@ function AccountMenu({
       <form action="/auth/signout" method="post">
         <button
           type="submit"
-          onClick={onNavigate}
           className="border-brutal-thin px-2 py-0.5 font-display text-xs font-bold brutal-fade"
         >
           Sign out

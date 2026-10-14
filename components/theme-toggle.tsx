@@ -2,6 +2,7 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useSyncExternalStore } from "react";
+import { Button } from "@/components/ui/button";
 
 export const THEME_STORAGE_KEY = "denslab-theme";
 
@@ -46,19 +47,21 @@ export function ThemeToggle() {
     theme === "dark" ? "Switch to light mode" : "Switch to dark mode";
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="icon"
       onClick={toggleTheme}
       title={label}
       aria-label={label}
       aria-pressed={theme === "dark"}
-      className="border-brutal-thin flex h-9 w-9 items-center justify-center bg-accent text-on-accent outline-offset-2 focus-visible:outline-[3px] focus-visible:outline-ink brutal-press sm:h-10 sm:w-10"
+      className="border-brutal-thin h-9 w-9 rounded-none bg-accent text-on-accent shadow-none outline-offset-2 hover:bg-accent focus-visible:outline-[3px] focus-visible:outline-ink brutal-press sm:h-10 sm:w-10"
     >
       <Sun className="h-4 w-4 dark:hidden sm:h-[18px] sm:w-[18px]" aria-hidden="true" />
       <Moon
         className="hidden h-4 w-4 dark:block sm:h-[18px] sm:w-[18px]"
         aria-hidden="true"
       />
-    </button>
+    </Button>
   );
 }

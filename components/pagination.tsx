@@ -1,5 +1,10 @@
-import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Pagination as PaginationRoot,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+} from "@/components/ui/pagination";
 
 /**
  * Builds a page list with ellipses, e.g. 1 … 4 5 6 … 20.
@@ -36,8 +41,15 @@ function hrefFor(basePath: string, query: string, page: number) {
   return search ? `${basePath}?${search}` : basePath;
 }
 
+/** Shared cell geometry; `PaginationLink` only supplies the a11y wiring. */
+const cell =
+  "border-brutal-thin flex h-10 min-w-10 items-center justify-center rounded-none px-3 font-display text-sm font-bold";
+const disabled = `${cell} cursor-not-allowed opacity-40`;
+const active = `${cell} bg-accent text-on-accent hover:bg-accent`;
+
 /**
- * Numbered pagination. Links rather than client buttons, so each page stays
+ * Numbered pagination. Rendered through the shadcn Pagination primitives, but
+ * kept as links with real hrefs rather than client buttons, so each page stays
  * cacheable and works without JavaScript.
  */
 export function Pagination({
@@ -55,70 +67,77 @@ export function Pagination({
 
   const items = pageWindow(page, pageCount);
 
-  const cell =
-    "border-brutal-thin flex h-10 min-w-10 items-center justify-center px-3 font-display text-sm font-bold";
-  const disabled = `${cell} cursor-not-allowed opacity-40`;
-  const active = `${cell} bg-accent text-on-accent`;
-
   return (
-    <nav
-      aria-label="Pagination"
-      className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:mt-10"
-    >
-      {page > 1 ? (
-        <Link
-          href={hrefFor(basePath, query, page - 1)}
-          rel="prev"
-          aria-label="Previous page"
-          className={`${cell} brutal-press`}
-        >
-          <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-        </Link>
-      ) : (
-        <span className={disabled} aria-hidden="true">
-          <ChevronLeft className="h-4 w-4" />
-        </span>
-      )}
+    <PaginationRoot className="mt-8 flex-wrap gap-2 sm:mt-10">
+      <PaginationContent className="flex-wrap justify-center gap-2">
+        <PaginationItem>
+          {page > 1 ? (
+            <PaginationLink
+              href={hrefFor(basePath, query, page - 1)}
+              rel="prev"
+              aria-label="Previous page"
+              className={`${cell} brutal-press`}
+            >
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            </PaginationLink>
+          ) : (
+            <span className={disabled} aria-hidden="true">
+              <ChevronLeft className="h-4 w-4" />
+            </span>
+          )}
+        </PaginationItem>
 
-      {items.map((item, index) =>
-        item === "gap" ? (
-          <span
-            key={`gap-${index}`}
-            aria-hidden="true"
-            className="px-1 font-display text-sm font-bold"
-          >
-            …
-          </span>
-        ) : item === page ? (
-          <span key={item} className={active} aria-current="page">
-            {item}
-          </span>
-        ) : (
-          <Link
-            key={item}
-            href={hrefFor(basePath, query, item)}
-            aria-label={`Page ${item}`}
-            className={`${cell} brutal-press`}
-          >
-            {item}
-          </Link>
-        ),
-      )}
+        {items.map((item, index) =>
+          item === "gap" ? (
+            <PaginationItem key={`gap-${index}`}>
+              <span
+                aria-hidden="true"
+                className="px-1 font-display text-sm font-bold"
+              >
+                …
+              </span>
+            </PaginationItem>
+          ) : item === page ? (
+            <PaginationItem key={item}>
+              <PaginationLink
+                isActive
+                href={hrefFor(basePath, query, item)}
+                aria-label={`Page ${item}, current page`}
+                className={active}
+              >
+                {item}
+              </PaginationLink>
+            </PaginationItem>
+          ) : (
+            <PaginationItem key={item}>
+              <PaginationLink
+                href={hrefFor(basePath, query, item)}
+                aria-label={`Page ${item}`}
+                className={`${cell} brutal-press`}
+              >
+                {item}
+              </PaginationLink>
+            </PaginationItem>
+          ),
+        )}
 
-      {page < pageCount ? (
-        <Link
-          href={hrefFor(basePath, query, page + 1)}
-          rel="next"
-          aria-label="Next page"
-          className={`${cell} brutal-press`}
-        >
-          <ChevronRight className="h-4 w-4" aria-hidden="true" />
-        </Link>
-      ) : (
-        <span className={disabled} aria-hidden="true">
-          <ChevronRight className="h-4 w-4" />
-        </span>
-      )}
-    </nav>
+        <PaginationItem>
+          {page < pageCount ? (
+            <PaginationLink
+              href={hrefFor(basePath, query, page + 1)}
+              rel="next"
+              aria-label="Next page"
+              className={`${cell} brutal-press`}
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            </PaginationLink>
+          ) : (
+            <span className={disabled} aria-hidden="true">
+              <ChevronRight className="h-4 w-4" />
+            </span>
+          )}
+        </PaginationItem>
+      </PaginationContent>
+    </PaginationRoot>
   );
 }

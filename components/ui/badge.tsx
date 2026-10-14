@@ -1,13 +1,33 @@
-import type { ComponentProps } from "react";
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
-/**
- * Neobrutalist category pill: accent fill, hard border, no rounding.
- */
-export function Badge({ className = "", ...props }: ComponentProps<"span">) {
+import { cn } from "@/lib/utils"
+
+const badgeVariants = cva(
+  "inline-flex items-center gap-1 border-brutal-thin px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide transition-colors sm:text-[11px] focus:outline-none focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-ink",
+  {
+    variants: {
+      variant: {
+        default: "bg-accent text-on-accent",
+        secondary: "bg-surface text-ink",
+        destructive: "bg-destructive text-destructive-foreground",
+        outline: "bg-canvas text-ink",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLSpanElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
   return (
-    <span
-      className={`border-brutal-thin inline-flex items-center gap-1 bg-accent px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-on-accent sm:text-[11px] ${className}`}
-      {...props}
-    />
-  );
+    <span className={cn(badgeVariants({ variant }), className)} {...props} />
+  )
 }
+
+export { Badge, badgeVariants }

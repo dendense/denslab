@@ -1,15 +1,21 @@
-import type { ComponentProps } from "react";
+import { cn } from "@/lib/utils"
 
 /**
- * Neobrutalist loading placeholder: flat block, hard border, no rounding.
- * The diagonal stripe pattern moves, so it reads as "loading" without a spinner.
+ * shadcn Skeleton shell, restyled to the denslab neobrutalist look: the moving
+ * diagonal stripe already reads as "loading" without a spinner, so the default
+ * `animate-pulse` is dropped. `aria-hidden` keeps it out of the a11y tree.
  */
-export function Skeleton({ className = "", ...props }: ComponentProps<"div">) {
+function Skeleton({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       aria-hidden="true"
-      className={`brutal-skeleton border-brutal-thin bg-canvas ${className}`}
+      className={cn("brutal-skeleton border-brutal-thin bg-canvas", className)}
       {...props}
     />
-  );
+  )
 }
+
+export { Skeleton }

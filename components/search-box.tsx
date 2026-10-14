@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Search, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 /**
  * Search form for the gallery.
@@ -8,6 +10,9 @@ import { Search, X } from "lucide-react";
  * so results are shareable and bookmarkable, pagination keeps the term, and the
  * page still works without JavaScript. Submitting resets `page` because the
  * form only carries the fields it declares.
+ *
+ * shadcn Input/Button supply the shell; denslab's brutal utilities and the mono
+ * type keep the site's own look.
  */
 export function SearchBox({
   action = "/",
@@ -30,33 +35,34 @@ export function SearchBox({
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
           aria-hidden="true"
         />
-        <input
+        <Input
           type="search"
           name="q"
           defaultValue={defaultValue}
           placeholder="Search title, description, or tag"
           aria-label="Search posts"
           maxLength={80}
-          className="border-brutal-thin h-11 w-full bg-canvas pl-9 pr-3 font-mono text-sm"
+          className="border-brutal-thin h-11 rounded-none bg-canvas pl-9 pr-3 font-mono text-sm shadow-none focus-visible:ring-0"
         />
       </div>
 
-      <button
+      <Button
         type="submit"
-        className="border-brutal-thin h-11 shrink-0 bg-accent px-4 font-display text-sm font-bold text-on-accent shadow-brutal-sm brutal-press"
+        className="border-brutal-thin h-11 shrink-0 rounded-none bg-accent px-4 font-display text-sm font-bold text-on-accent shadow-brutal-sm brutal-press hover:bg-accent"
       >
         Search
-      </button>
+      </Button>
 
       {defaultValue && (
-        <Link
-          href={action}
-          aria-label="Clear search"
-          title="Clear search"
-          className="border-brutal-thin flex h-11 w-11 shrink-0 items-center justify-center brutal-press"
+        <Button
+          asChild
+          variant="outline"
+          className="border-brutal-thin h-11 w-11 shrink-0 rounded-none bg-canvas p-0 brutal-press hover:bg-canvas"
         >
-          <X className="h-4 w-4" aria-hidden="true" />
-        </Link>
+          <Link href={action} aria-label="Clear search" title="Clear search">
+            <X className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </Button>
       )}
     </form>
   );

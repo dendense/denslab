@@ -3,6 +3,10 @@
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { createPost, updatePost, type ActionResult } from "@/app/admin/actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { AiMetadata, PhotoMetadata, Post } from "@/lib/posts";
 
 type Category = "AI Generated" | "Photoshoot";
@@ -28,7 +32,7 @@ function initialCategory(post?: Post): Category {
 }
 
 const inputClass =
-  "border-brutal-thin w-full bg-canvas px-3 py-2 font-mono text-sm";
+  "border-brutal-thin h-auto w-full rounded-none bg-canvas px-3 py-2 font-mono text-sm shadow-none focus-visible:ring-0";
 
 const labelClass =
   "mb-1 block font-mono text-[10px] font-bold uppercase tracking-wide";
@@ -75,37 +79,40 @@ export function PostForm({
           Category
         </legend>
 
-        <div className="flex flex-wrap gap-2">
+        <RadioGroup
+          name="category"
+          value={category}
+          onValueChange={(value) => setCategory(value as Category)}
+          className="flex flex-wrap gap-2"
+        >
           {(["AI Generated", "Photoshoot"] as const).map((option) => {
             const active = category === option;
             return (
-              <label
+              <Label
                 key={option}
-                className={`border-brutal-thin cursor-pointer px-4 py-2 font-display text-sm font-bold brutal-press ${
+                htmlFor={`category-${option}`}
+                className={`border-brutal-thin cursor-pointer rounded-none px-4 py-2 font-display text-sm font-bold brutal-press ${
                   active ? "bg-accent text-on-accent" : "bg-canvas"
                 }`}
               >
-                <input
-                  type="radio"
-                  name="category"
+                <RadioGroupItem
+                  id={`category-${option}`}
                   value={option}
-                  checked={active}
-                  onChange={() => setCategory(option)}
                   className="sr-only"
                 />
                 {option}
-              </label>
+              </Label>
             );
           })}
-        </div>
+        </RadioGroup>
       </fieldset>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <label htmlFor="title" className={labelClass}>
+          <Label htmlFor="title" className={labelClass}>
             Title
-          </label>
-          <input
+          </Label>
+          <Input
             id="title"
             name="title"
             defaultValue={post?.title ?? ""}
@@ -115,9 +122,9 @@ export function PostForm({
         </div>
 
         <div className="sm:col-span-2">
-          <label htmlFor="description" className={labelClass}>
+          <Label htmlFor="description" className={labelClass}>
             Conceptual description
-          </label>
+          </Label>
           <textarea
             id="description"
             name="description"
@@ -128,10 +135,10 @@ export function PostForm({
         </div>
 
         <div className="sm:col-span-2">
-          <label htmlFor="imgurId" className={labelClass}>
+          <Label htmlFor="imgurId" className={labelClass}>
             Imgur URL or id
-          </label>
-          <input
+          </Label>
+          <Input
             id="imgurId"
             name="imgurId"
             placeholder="https://i.imgur.com/abc123.jpg"
@@ -141,10 +148,10 @@ export function PostForm({
         </div>
 
         <div>
-          <label htmlFor="width" className={labelClass}>
+          <Label htmlFor="width" className={labelClass}>
             Width (px)
-          </label>
-          <input
+          </Label>
+          <Input
             id="width"
             name="width"
             type="number"
@@ -155,10 +162,10 @@ export function PostForm({
         </div>
 
         <div>
-          <label htmlFor="height" className={labelClass}>
+          <Label htmlFor="height" className={labelClass}>
             Height (px)
-          </label>
-          <input
+          </Label>
+          <Input
             id="height"
             name="height"
             type="number"
@@ -169,10 +176,10 @@ export function PostForm({
         </div>
 
         <div className="sm:col-span-2">
-          <label htmlFor="tags" className={labelClass}>
+          <Label htmlFor="tags" className={labelClass}>
             Tags (comma separated)
-          </label>
-          <input
+          </Label>
+          <Input
             id="tags"
             name="tags"
             placeholder="cinematic, night, wide"
@@ -190,9 +197,9 @@ export function PostForm({
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label htmlFor="prompt" className={labelClass}>
+              <Label htmlFor="prompt" className={labelClass}>
                 Prompt
-              </label>
+              </Label>
               <textarea
                 id="prompt"
                 name="prompt"
@@ -203,9 +210,9 @@ export function PostForm({
             </div>
 
             <div className="sm:col-span-2">
-              <label htmlFor="negativePrompt" className={labelClass}>
+              <Label htmlFor="negativePrompt" className={labelClass}>
                 Negative prompt
-              </label>
+              </Label>
               <textarea
                 id="negativePrompt"
                 name="negativePrompt"
@@ -216,10 +223,10 @@ export function PostForm({
             </div>
 
             <div>
-              <label htmlFor="model" className={labelClass}>
+              <Label htmlFor="model" className={labelClass}>
                 Model
-              </label>
-              <input
+              </Label>
+              <Input
                 id="model"
                 name="model"
                 defaultValue={ai.model}
@@ -228,10 +235,10 @@ export function PostForm({
             </div>
 
             <div>
-              <label htmlFor="platform" className={labelClass}>
+              <Label htmlFor="platform" className={labelClass}>
                 Platforms
-              </label>
-              <input
+              </Label>
+              <Input
                 id="platform"
                 name="platform"
                 defaultValue={ai.platform}
@@ -240,10 +247,10 @@ export function PostForm({
             </div>
 
             <div>
-              <label htmlFor="seed" className={labelClass}>
+              <Label htmlFor="seed" className={labelClass}>
                 Seed
-              </label>
-              <input
+              </Label>
+              <Input
                 id="seed"
                 name="seed"
                 type="number"
@@ -261,10 +268,10 @@ export function PostForm({
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="body" className={labelClass}>
+              <Label htmlFor="body" className={labelClass}>
                 Body
-              </label>
-              <input
+              </Label>
+              <Input
                 id="body"
                 name="body"
                 defaultValue={photo.body}
@@ -273,10 +280,10 @@ export function PostForm({
             </div>
 
             <div>
-              <label htmlFor="lens" className={labelClass}>
+              <Label htmlFor="lens" className={labelClass}>
                 Lens
-              </label>
-              <input
+              </Label>
+              <Input
                 id="lens"
                 name="lens"
                 defaultValue={photo.lens}
@@ -285,10 +292,10 @@ export function PostForm({
             </div>
 
             <div>
-              <label htmlFor="aperture" className={labelClass}>
+              <Label htmlFor="aperture" className={labelClass}>
                 Aperture
-              </label>
-              <input
+              </Label>
+              <Input
                 id="aperture"
                 name="aperture"
                 placeholder="f/1.8"
@@ -298,10 +305,10 @@ export function PostForm({
             </div>
 
             <div>
-              <label htmlFor="shutterSpeed" className={labelClass}>
+              <Label htmlFor="shutterSpeed" className={labelClass}>
                 Shutter speed
-              </label>
-              <input
+              </Label>
+              <Input
                 id="shutterSpeed"
                 name="shutterSpeed"
                 placeholder="1/250s"
@@ -311,10 +318,10 @@ export function PostForm({
             </div>
 
             <div>
-              <label htmlFor="iso" className={labelClass}>
+              <Label htmlFor="iso" className={labelClass}>
                 ISO
-              </label>
-              <input
+              </Label>
+              <Input
                 id="iso"
                 name="iso"
                 type="number"
@@ -337,25 +344,26 @@ export function PostForm({
       )}
 
       <div className="flex flex-wrap items-center gap-3">
-        <button
+        <Button
           type="submit"
           disabled={pending}
           aria-busy={pending}
-          className="border-brutal-thin inline-flex items-center gap-2 bg-accent px-4 py-2 font-display text-sm font-bold text-on-accent shadow-brutal-sm brutal-press disabled:cursor-not-allowed disabled:opacity-60"
+          className="border-brutal-thin h-auto gap-2 rounded-none bg-accent px-4 py-2 font-display text-sm font-bold text-on-accent shadow-brutal-sm brutal-press hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
         >
           {pending && (
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
           )}
           {post ? "Save changes" : "Create post"}
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={onCancel}
-          className="border-brutal-thin px-4 py-2 font-display text-sm font-bold brutal-press"
+          className="border-brutal-thin h-auto rounded-none bg-canvas px-4 py-2 font-display text-sm font-bold shadow-none brutal-press hover:bg-canvas"
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -1,8 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 import { Lock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 
 /**
- * Placeholder card for features that are planned but not built. Dashed border
+ * Placeholder card for features that are planned but not built. A dashed border
  * signals "not active yet" while staying inside the Neobrutalist palette.
  */
 export function ComingSoonCard({
@@ -15,7 +17,7 @@ export function ComingSoonCard({
   description: string;
 }) {
   return (
-    <section className="border-brutal-thin border-dashed bg-canvas p-4 sm:p-5">
+    <Card className="border-dashed p-4 sm:p-5">
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
@@ -29,15 +31,15 @@ export function ComingSoonCard({
             <h3 className="font-display text-base font-bold sm:text-lg">
               {title}
             </h3>
-            <span className="border-brutal-thin inline-flex items-center gap-1 bg-accent px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wide text-on-accent">
+            <Badge>
               <Lock className="h-3 w-3" aria-hidden="true" />
               Coming soon
-            </span>
+            </Badge>
           </div>
 
           <p className="font-mono text-xs leading-relaxed">{description}</p>
         </div>
       </div>
-    </section>
+    </Card>
   );
 }

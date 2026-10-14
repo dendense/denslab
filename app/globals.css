@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/*
+ * tailwindcss-animate supplies the `animate-in` / `fade-in` / `slide-in-from-*`
+ * utilities that shadcn/ui components ship with (dialog, dropdown, sheet).
+ * Without it those classes compile to nothing and every overlay pops in.
+ * Tailwind v4 loads plugins from CSS, so no tailwind.config.ts is needed.
+ */
+@plugin "tailwindcss-animate";
+
 /* Theme is toggled by the `data-theme` attribute on <html>, so the toggle can
    override the OS preference and `dark:` utilities follow the same source. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -25,6 +33,38 @@
   --obsidian-discover-fill: #18181b;
   --obsidian-discover-active-text: #ffffff;
   --obsidian-discover-border: #71717a;
+
+  /*
+   * shadcn/ui token layer (Tailwind v4). Kept in HEX, not the OKLCH default,
+   * so the premium palette stays the single source of truth. Denslab values win
+   * over the shadcn reference table where the two disagree on brand:
+   * `--primary` is the brand blue #2563eb, and `--primary-foreground` is
+   * `--on-accent` (5.17:1 on it) rather than shadcn's near-white.
+   */
+  --background: #fafafa;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #09090b;
+  --muted: #f4f4f5;
+  --muted-foreground: #52525b;
+  /*
+   * `--accent` is deliberately NOT redeclared in the shadcn block below:
+   * denslab's own `--accent` (#2563eb) is set above and is what `bg-accent`
+   * must keep resolving to. Only `--accent-foreground` is shadcn's.
+   */
+  --accent-foreground: #09090b;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #2563eb;
+  --radius: 0.75rem;
 }
 
 [data-theme="dark"] {
@@ -45,9 +85,68 @@
   --obsidian-discover-fill: #3b82f6;
   --obsidian-discover-active-text: #0b1220;
   --obsidian-discover-border: #71717a;
+
+  /*
+   * Premium dark premium tokens in HEX. This block replaces the `.dark` block
+   * the default shadcn setup writes: denslab drives the theme with
+   * `data-theme="dark"` on <html>, so `[data-theme="dark"]` here is already the
+   * Opsi-2 rename of `.dark` and no `.dark` block should be added later.
+   */
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #18181b;
+  --card-foreground: #fafafa;
+  --popover: #18181b;
+  --popover-foreground: #fafafa;
+  --primary: #3b82f6;
+  --primary-foreground: #0b1220;
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  /*
+   * `--accent` is deliberately NOT redeclared here. denslab's own `--accent`
+   * (#3b82f6, denslab blue) is set earlier in this block and is what the
+   * existing `bg-accent` / `text-accent` utilities must keep resolving to.
+   * Only `--accent-foreground` comes from shadcn.
+   */
+  --accent-foreground: #fafafa;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #3b82f6;
 }
 
 @theme inline {
+  /*
+   * shadcn/ui tokens → Tailwind utilities (`bg-background`, `text-muted-foreground`,
+   * `rounded-lg`, …). Mapped here, never redeclared: the values live in the
+   * `:root` / `[data-theme="dark"]` blocks above.
+   */
+  --color-background: var(--background);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
   /* Denslab palette exposed to Tailwind utilities. */
   --color-canvas: var(--canvas);
   --color-ink: var(--ink);
@@ -67,6 +166,10 @@
   --shadow-brutal-lg: 0 4px 8px rgb(9 9 11 / 10%), 0 28px 60px -16px rgb(9 9 11 / 30%);
   --shadow-brutal-press: 0 1px 2px rgb(9 9 11 / 6%), 0 6px 16px -8px rgb(9 9 11 / 22%);
   --shadow-brutal-hover: 0 2px 4px rgb(9 9 11 / 8%), 0 18px 40px -12px rgb(9 9 11 / 28%);
+
+  /* shadcn token shadow — soft by design (never the Neobrutalist hard offset),
+     so components added later can carry a premium shadow without a custom class. */
+  --shadow-shadcn: 0 2px 4px rgb(9 9 11 / 8%), 0 18px 40px -12px rgb(9 9 11 / 28%);
 
   /* Premium radius (was 0px in the Neobrutalist phase). */
   --radius-brutal: 12px;
@@ -216,7 +319,7 @@
   }
 
   body {
-    background-color: var(--canvas);
+    background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   }
