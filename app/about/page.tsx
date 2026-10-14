@@ -18,7 +18,7 @@ const aboutImage = {
 
 export default function AboutPage() {
   return (
-    <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
+    <main className="theme-obsidian w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">
       <article className="mx-auto max-w-4xl space-y-8 sm:space-y-10">
         <header className="space-y-3 border-b-brutal pb-6 sm:space-y-4">
           <span className="border-brutal-thin inline-block bg-accent px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-on-accent sm:text-[11px]">
