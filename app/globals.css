@@ -83,7 +83,14 @@
   --obsidian-fg: #09090b;
   --obsidian-accent: #2563eb;
   --obsidian-on-accent: #ffffff;
-  --obsidian-edge: #e4e4e7;
+  /*
+   * Structural edge. Must clear 3:1 against the surfaces it is drawn on
+   * (WCAG 1.4.11), and the border is the only card boundary once the hard
+   * shadow is replaced by a soft one. zinc-500 is the same neutral the base
+   * dark theme uses: 4.63:1 on the card surface #fafafa, 4.75:1 on the page
+   * #fffdf8. (#e4e4e7 was 1.22:1 — cards had no visible outline.)
+   */
+  --obsidian-edge: #71717a;
   --obsidian-radius: 12px;
   /* Layered soft shadows replace the hard offset ones. */
   --obsidian-shadow-sm: 0 1px 2px rgb(9 9 11 / 6%), 0 8px 24px -10px rgb(9 9 11 / 18%);
@@ -93,6 +100,8 @@
   --obsidian-discover-text: #09090b;
   --obsidian-discover-fill: #18181b;
   --obsidian-discover-active-text: #ffffff;
+  /* Pill outline must be visible on the page without hover: 4.63:1 on #fafafa. */
+  --obsidian-discover-border: #71717a;
 
   /* Re-point denslab's palette tokens for this subtree only. */
   --canvas: var(--obsidian-canvas);
@@ -110,13 +119,19 @@
   --obsidian-accent: #3b82f6;
   /* Dark-on-blue: #0b1220 on #3b82f6 is 5.09:1. */
   --obsidian-on-accent: #0b1220;
-  --obsidian-edge: #3f3f46;
+  /*
+   * Same structural edge as light mode: 4.12:1 on the card surface #09090b.
+   * (#3f3f46 was 1.91:1 — cards had no visible outline.)
+   */
+  --obsidian-edge: #71717a;
   --obsidian-shadow-sm: 0 1px 2px rgb(0 0 0 / 50%), 0 16px 40px -14px rgb(0 0 0 / 70%);
   --obsidian-shadow-hover: 0 2px 6px rgb(0 0 0 / 55%), 0 24px 52px -16px rgb(0 0 0 / 80%);
   --obsidian-discover-surface: rgb(24 24 27 / 85%);
   --obsidian-discover-text: #fafafa;
   --obsidian-discover-fill: #3b82f6;
   --obsidian-discover-active-text: #0b1220;
+  /* Visible against the blended pill surface (#161619) at 3.74:1. */
+  --obsidian-discover-border: #71717a;
 }
 
 /*
@@ -133,6 +148,19 @@
 .theme-obsidian .border-brutal-thin {
   border-color: var(--obsidian-edge);
   border-radius: calc(var(--obsidian-radius) - 2px);
+}
+
+/*
+ * Accent-filled pills (Details pill, category Badge, Search button, active
+ * pagination cell) carry `bg-accent`, so their border must clear 3:1 against
+ * the ACCENT fill, not the page — the neutral edge only reaches 1.07:1
+ * (light) / 1.31:1 (dark) there. `--on-accent` is the token already chosen to
+ * sit on the accent (white on #2563eb = 5.17:1; #0b1220 on #3b82f6 = 5.09:1),
+ * and it keeps the pill outline the same colour as its label.
+ */
+.theme-obsidian .bg-accent.border-brutal,
+.theme-obsidian .bg-accent.border-brutal-thin {
+  border-color: var(--on-accent);
 }
 
 .theme-obsidian .shadow-brutal-sm {

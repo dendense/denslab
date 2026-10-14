@@ -2,9 +2,12 @@
  * Discover Button — adapted from ObsidianUI (https://www.obsidianui.dev),
  * MIT licensed (see NOTICE-obsidianui.md).
  *
- * Only the colours were re-pointed at denslab's scoped theme tokens
+ * Colours were re-pointed at denslab's scoped theme tokens
  * (--obsidian-discover-*) so the button follows light/dark; geometry and the
- * reduced-motion handling are the original.
+ * reduced-motion handling are the original. The one geometry-adjacent change:
+ * the original 1px border was rgb(255 255 255 / 30%), which is invisible on a
+ * light page (1.04:1) and left the pill with no shape until hover — it now
+ * uses --obsidian-discover-border, which clears 3:1 on both modes.
  */
 .obsidian-discover-button {
   position: relative;
@@ -13,7 +16,7 @@
   max-width: 100%;
   align-items: center;
   overflow: hidden;
-  border: 1px solid rgb(255 255 255 / 30%);
+  border: 1px solid var(--obsidian-discover-border, rgb(113 113 122 / 90%));
   border-radius: 999px;
   background: var(--obsidian-discover-surface, rgb(237 237 237 / 92%));
   backdrop-filter: blur(10px);
