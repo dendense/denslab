@@ -9,6 +9,7 @@ import { DenslabWordmarkLink } from "@/components/denslab-wordmark-link";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
@@ -302,17 +303,79 @@ export function SiteHeader() {
                 </Button>
               </SheetTrigger>
 
-              <SheetContent side="right" className="w-72 sm:max-w-xs">
-                <SheetHeader>
+              {/*
+                Fullscreen SOLID menu (Deny: "fullscreen warna solid, nol blur").
+
+                Everything here is call-site `className` — `components/ui/sheet.tsx`
+                is shared and is NOT modified. `cn()` in that file is tailwind-merge,
+                so the later call-site classes win their groups over the `side`
+                variant's `inset-y-0 right-0 h-full w-3/4 sm:max-w-sm` and
+                `border-l`:
+                  - `inset-0` beats `inset-y-0` + `right-0` (parent group wins)
+                  - `w-full` beats `w-3/4`, `max-w-none` beats `sm:max-w-sm`
+                  - `border-0` beats `border-l`
+                The panel keeps `bg-background` from sheetVariants, which IS the
+                solid palette token — hence `backdrop-filter` is never set here
+                and never needed.
+
+                `p-0` drops the variant's `p-6` so `flex flex-col` can own the
+                layout: header / scrollable items / close button pinned to the
+                bottom. `[&>[data-sheet-close]]:hidden` removes the stock
+                top-right X that sheet.tsx renders as its first child — the
+                close control Deny asked for is a labelled button at the bottom
+                instead. See the report: the hidden node is `display:none`, so it
+                is not focusable and there is exactly ONE reachable close button.
+              */}
+              <SheetContent
+                side="right"
+                className="inset-0 flex h-full w-full max-w-none flex-col gap-0 border-0 p-0 sm:max-w-none [&>[data-sheet-close]]:hidden"
+              >
+                <SheetHeader className="px-6 pt-6 pb-2 text-left">
                   <SheetTitle>Menu</SheetTitle>
                 </SheetHeader>
 
+                {/* `min-h-0` + `overflow-y-auto` is what keeps the close button
+                    reachable on a short screen (320x568): the list scrolls, the
+                    footer does not. */}
                 <ul
-                  className="flex flex-col gap-2 px-4 pb-4"
+                  className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-4 py-4"
                   onClick={() => setMobileOpen(false)}
                 >
                   {items}
+                  {/* The shared `items` marks ThemeToggle `hidden md:block` to
+                      stop the *header* row rendering two toggles, which also
+                      removed it from this drawer (a <768px drawer showed no
+                      toggle at all). Deny wants it in the menu, so the drawer
+                      carries its own row. */}
+                  <li className="px-4 py-1">
+                    <ThemeToggle />
+                  </li>
                 </ul>
+
+                {/* Close control, moved from the top-right X to the bottom.
+                    Background is the sheet's own `bg-background` (Deny: "warna
+                    latar sama dengan menu solid") — `ghost` adds no fill, so the
+                    button is exactly the menu colour and only the label is drawn.
+                    Label is `--foreground`, measured 15.19:1 light / 16.75:1 dark
+                    against `--background`, well clear of the 4.5:1 text floor.
+
+                    Extra spacing (Deny asked for "sedikit tambahan jarak"):
+                    `pb-[calc(1.5rem+env(safe-area-inset-bottom))]` = 24px + the
+                    iPhone home-indicator inset. 24px rather than the 16px (`pb-4`)
+                    used elsewhere so the button does not sit flush against the
+                    bottom edge, and the `env()` term is what keeps it from being
+                    covered by the gesture bar on a notched iPhone. The `pt-4` puts
+                    16px between the divider and the button. */}
+                <div className="border-t border-border px-4 pt-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+                  <SheetClose asChild>
+                    <Button
+                      variant="ghost"
+                      className="h-11 w-full justify-center px-4"
+                    >
+                      Close
+                    </Button>
+                  </SheetClose>
+                </div>
               </SheetContent>
             </Sheet>
           </div>

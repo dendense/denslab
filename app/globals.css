@@ -349,47 +349,6 @@
 }
 
 /*
- * Wordmark hover flip (components/denslab-wordmark-link.tsx).
- *
- * Declared here rather than as Tailwind arbitrary values because Tailwind v4
- * emits no rule at all for `transition-delay-[var(--x)]` — verified against the
- * built bundle, zero `transition-delay` rules were generated, so the letters
- * would flip in unison with no stagger.
- *
- * Each letter carries two custom properties, the incoming and outgoing delay.
- * The base rule uses the outgoing one, :hover swaps to the incoming one, so the
- * sequence runs forward on hover and unwinds in reverse on leave. Both live on
- * the letter rather than the group because the delay value differs per letter.
- */
-.denslab-wordmark-letter {
-  display: inline-block;
-  transform-style: preserve-3d;
-  transition-property: transform;
-  transition-duration: 200ms;
-  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  transition-delay: var(--denslab-delay-out);
-}
-
-.denslab-wordmark-group:hover .denslab-wordmark-letter {
-  transform: rotateX(calc(160deg * -1)) rotateY(160deg);
-  transition-delay: var(--denslab-delay-in);
-}
-
-/*
- * Reduced motion, restated for this component. The blanket rule above already
- * forces `transition-duration: 0.01ms !important` and would normally suffice,
- * but the flip is the whole point of this element — a local rule keeps it static
- * even if that global block is ever reorganised. No `@keyframes` is involved, so
- * a collapsed duration means the letters snap with no animation.
- */
-@media (prefers-reduced-motion: reduce) {
-  .denslab-wordmark-letter {
-    transition-duration: 0.01ms !important;
-    transition-delay: 0ms !important;
-  }
-}
-
-/*
  * Hero typing effect on the final word of the headline, plus a blinking caret.
  *
  * Mechanism: `clip-path: inset()` reveals a growing slice of the word, left to
