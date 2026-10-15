@@ -14,67 +14,123 @@
 
 :root,
 [data-theme="light"] {
-  /* Premium light palette — near-white canvas + neutral surface + blue accent. */
-  --foreground: #09090b;
-  --accent: #f4f4f5;
-
   /*
-   * shadcn/ui token layer (Tailwind v4). Kept in HEX, not the OKLCH default,
-   * so the premium palette stays the single source of truth. Denslab values win
-   * over the shadcn reference table where the two disagree on brand:
-   * `--primary` is the brand blue #2563eb, and `--primary-foreground` is
-   * #ffffff (5.17:1 on it) rather than shadcn's near-white.
+   * Palette: LIME FROST (Canvas / Ink / Signal lineage kept, hue replaced).
+   * `--canvas` / `--ink` / `--signal` are still documentation aliases, not the
+   * drivers: 44 `.tsx` files reach the palette through the shadcn token names
+   * below, so renaming would edit dozens of files for no visual gain.
+   *
+   * Every value here is now a FLAT HEX from the Lime Frost spec (Deny,
+   * 2026-10-15) — the previous palette derived most tokens with `color-mix`
+   * from three base colours; that indirection is gone, so a contrast number in
+   * this file can be read straight off the hex rather than recomputed.
+   *
+   * DECISION #1 (Deny): `--primary` stays INK, NOT lime. Lime enters the
+   * palette at `--ring` only. Reversing this would wash every default button
+   * pale green — do not.
+   *
+   * DECISION #3: the spec's `--ice` #B8E6EA is DROPPED — it has no partner
+   * token in this repo and nothing consumes it.
+   *
+   * DECISION #4: `--border` #D5E3C0 is 1.17:1 over `--background`, BELOW the
+   * 3:1 non-text floor and below the palette it replaces (1.49:1). Accepted by
+   * Deny; reported, not "fixed".
+   *
+   * DECISION #6: no `--success` / `--warning` / `--info` — this repo defines no
+   * partner token for them, so they are not added.
+   *
+   * `--radius` stays 0.75rem (decision Q3) — buttons are already `rounded-none`
+   * from card t_112a8db8 and must not be "tidied up" here.
+   *
+   * Contrast: all pairs re-measured from the hex below, both themes, WCAG
+   * formula. Numbers and the failing pairs are in the task's measurement table;
+   * `--border`/`--input` are the only deliberate sub-3:1 case (decision #4).
    */
-  --background: #fafafa;
-  --foreground: #09090b;
-  --card: #ffffff;
-  --card-foreground: #09090b;
-  --popover: #ffffff;
-  --popover-foreground: #09090b;
-  --primary: #2563eb;
-  --primary-foreground: #ffffff;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #09090b;
-  --muted: #f4f4f5;
-  --muted-foreground: #52525b;
-  --accent-foreground: #09090b;
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #2563eb;
+  --canvas: #F6FAF0;
+  --ink: #1B2410;
+  --signal: #A3E635;
+
+  /* `--destructive` stays RED on purpose — decision Q1. The concept doc's §3
+   * sets it to `var(--ink)`, which would make the "Hapus" button on /admin
+   * indistinguishable from "Simpan". `--destructive-foreground` is not in the
+   * Lime Frost spec; set to the theme's Canvas, mirroring `--primary-foreground`
+   * (the old #ffffff / #09090b pair kept a stale dark-theme navy that no longer
+   * matches any token here). */
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: #FFFFFF;
+  --card-foreground: var(--ink);
+  --popover: #FFFFFF;
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--canvas);
+  --secondary: #EAF2DD;
+  --secondary-foreground: var(--ink);
+  --muted: #EAF2DD;
+  --muted-foreground: #5A6B45;
+  /* `--accent` = spec's `--surface-alt` (decision #2), same as `--muted` here.
+   * Flat hex, so light-theme hover backgrounds are no longer an ink-mix. */
+  --accent: #EAF2DD;
+  --accent-foreground: var(--ink);
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #D5E3C0;
+  --input: #D5E3C0;
+  /* `--ring` light is #4D7C0F, a literal — NOT `var(--signal)`, which is the
+   * bright #A3E635 Lime and reads only 1.43:1 against this theme's Canvas
+   * (#F6FAF0), below the 3:1 non-text floor. #4D7C0F is the same green as
+   * `--link` and measures 5.05:1 on Canvas / 5.64:1 on white Card. The dark
+   * theme keeps its bright twin (see the block below) — the two themes are
+   * deliberately different values here. */
+  --ring: #4D7C0F;
   --radius: 0.75rem;
 }
 
 [data-theme="dark"] {
-  /* Premium dark palette — near-black canvas + zinc surface + brighter blue. */
-  --foreground: #fafafa;
-  --accent: #27272a;
-
-  /*
-   * Premium dark premium tokens in HEX. This block replaces the `.dark` block
-   * the default shadcn setup writes: denslab drives the theme with
+  /* Dark Lime Frost. Same token SET as `:root` — the two blocks must define an
+   * IDENTICAL token set or the theme breaks silently. This block replaces the
+   * `.dark` block the default shadcn setup writes: denslab drives the theme with
    * `data-theme="dark"` on <html>, so `[data-theme="dark"]` here is already the
    * Opsi-2 rename of `.dark` and no `.dark` block should be added later.
+   *
+   * Manual toggle ONLY (decision #5): there is NO `@media (prefers-color-scheme)`
+   * block in this file and none may be added — the OS preference is read once by
+   * the pre-paint script in `app/layout.tsx` and thereafter overridden by the
+   * stored value.
+   *
+   * `--ring` is #BEF264, the bright-Lime twin of the light theme's #4D7C0F —
+   * the only hue value that differs between themes apart from the
+   * Canvas/Ink swap. Left bright on purpose: on #0E140A it is 14.31:1.
    */
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #18181b;
-  --card-foreground: #fafafa;
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
-  --primary: #3b82f6;
-  --primary-foreground: #0b1220;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --accent-foreground: #fafafa;
-  --destructive: #ef4444;
-  --destructive-foreground: #09090b;
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #3b82f6;
+  --canvas: #0E140A;
+  --ink: #EEF5E4;
+  --signal: #BEF264;
+
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --card: #151D0F;
+  --card-foreground: var(--ink);
+  --popover: #151D0F;
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--canvas);
+  --secondary: #1E2916;
+  --secondary-foreground: var(--ink);
+  --muted: #1E2916;
+  --muted-foreground: #9DB088;
+  /* `--accent` = spec's `--surface-alt` (decision #2) in dark. */
+  --accent: #1E2916;
+  --accent-foreground: var(--ink);
+  /* Red kept (decision Q1); #F87171 is the dark-theme legibility twin. */
+  --destructive: #F87171;
+  --destructive-foreground: #0E140A;
+  --border: #2E3D21;
+  --input: #2E3D21;
+  --ring: var(--signal);
+  /* Declared here too, unchanged: `--radius` is theme-independent, but both
+   * blocks must define the same token SET or parity checks and future readers
+   * cannot tell a deliberate omission from a forgotten one. */
+  --radius: 0.75rem;
 }
 
 @theme inline {
@@ -110,6 +166,18 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /*
+   * Type token. Same value Tailwind v4 already ships as its `--font-mono`
+   * default (node_modules/tailwindcss/theme.css), declared locally on purpose:
+   * no webfont is loaded anywhere in this repo (`font-audit.md`, t_f3c0bb29),
+   * so the stack must resolve to fonts already on the visitor's machine. Making
+   * it explicit means a future Tailwind default change cannot silently swap the
+   * mono face out from under the 4 call sites (ui/label, donate-button,
+   * prompt-panel x2). No download, no build step, no dependency.
+   */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 }
 
 /*
@@ -164,8 +232,11 @@
   /*
    * Focus ring stays visible in both themes. The ring is drawn outside the
    * element (offset 2px), so it sits on the page background and has to clear
-   * 3:1 against that surface. `--ring` does in both: #2563eb on #fafafa is
-   * 4.63:1, #3b82f6 on #09090b is 5.02:1.
+   * 3:1 against that surface. Re-measured for the Lime Frost palette:
+   * light `--ring` #4D7C0F on Canvas #F6FAF0 is 5.05:1 (5.64:1 on the white
+   * Card), dark #BEF264 on #0E140A is 14.31:1. Both clear the non-text floor.
+   * The light value used to be `var(--signal)` #A3E635 at 1.43:1 — a
+   * regression against the palette it replaced; see the `:root` block.
    */
   :focus-visible {
     outline: 3px solid var(--ring);
@@ -317,3 +388,213 @@
     transition-delay: 0ms !important;
   }
 }
+
+/*
+ * Hero typing effect on the final word of the headline, plus a blinking caret.
+ *
+ * Mechanism: `clip-path: inset()` reveals a growing slice of the word, left to
+ * right. The clip is applied to the element's own painted box, so the text is
+ * fully present in the DOM and in the layout from the first frame; only how
+ * much of it is *visible* changes. That gives us a typing look with:
+ *   - no layout shift — the wrapper is `inline-block`, so its intrinsic width
+ *     is the width of the complete word from the very first frame and the line
+ *     box is final before the animation starts;
+ *   - no hydration work — the markup is identical on server and client, there
+ *     is no state and no `useEffect`, so React has nothing to reconcile. CSS
+ *     animations restart on every page load by themselves, which is exactly the
+ *     "every reload" behaviour requested: no `sessionStorage`, no JS at all.
+ *
+ * Smoothness (Deny: "kurang halus"). Three things do the work, all of them
+ * zero-JS:
+ *   - Rhythm. The twelve characters are NOT evenly spaced: the keyframes below
+ *     place each character at an explicit percentage, so the word starts a touch
+ *     slower, runs at speed through the middle, and lands with a beat on the full
+ *     stop. Deterministic by construction, so server and client can never
+ *     disagree — critically, NOT `Math.random()`.
+ *
+ *     The per-character *hold* (the letter stays put between stops instead of
+ *     sliding) is produced by `steps(1, end)` declared inside each keyframe, not
+ *     by the animation shorthand. Do not "simplify" those away in favour of
+ *     evenly dividing the timeline — the uneven percentages above are the point.
+ *   - Cadence. 840ms total ≈ 70ms per character, the range where typing reads
+ *     as deliberate rather than as a progress bar. The old 1.2s/12 was 100ms
+ *     per character and felt sluggish.
+ *   - No main-thread work. The reveal is a compositor-friendly `clip-path`
+ *     driven by the animation timeline; nothing runs per character, so there is
+ *     no jank and no `setInterval` to drift.
+ *
+ * Percentages are cumulative character positions: the word is 12 characters
+ * (11 letters + the full stop); with `steps`-free interpolation the clip must
+ * land on a character boundary, and the last stop is short to put a beat on
+ * the full stop.
+ */
+.denslab-hero-wrap {
+  /* inline-block: sizes to the complete word, so nothing below the hero moves. */
+  display: inline-block;
+  position: relative;
+}
+
+.denslab-hero-type {
+  display: inline-block;
+  /*
+   * `steps(12, end)` matches "one character at a time" at the animation level:
+   * twelve discrete steps for the twelve characters, each step holding its
+   * value until the next one starts.
+   *
+   * It is deliberately NOT the thing that produces the typing look, though.
+   * Each `@keyframes` stop below already carries its OWN
+   * `animation-timing-function: steps(1, end)`, and a timing function declared
+   * inside a keyframe overrides the animation-level one for the interval that
+   * starts there. So the per-character hold comes from the keyframes, and this
+   * shorthand value only governs any interval a keyframe leaves undeclared
+   * (there are none today). Both are `steps()`, so they agree — the shorthand
+   * would look identical with `linear` here. Kept explicit so the intent is
+   * readable at the declaration instead of only inside the keyframes.
+   */
+  animation: denslab-hero-type 840ms steps(12, end) both;
+}
+
+@keyframes denslab-hero-type {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  8.33% {
+    clip-path: inset(0 91.6667% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  16.67% {
+    clip-path: inset(0 83.3333% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  26.19% {
+    clip-path: inset(0 75% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  33.33% {
+    clip-path: inset(0 66.6667% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  40.48% {
+    clip-path: inset(0 58.3333% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  48.81% {
+    clip-path: inset(0 50% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  57.14% {
+    clip-path: inset(0 41.6667% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  65.48% {
+    clip-path: inset(0 33.3333% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  73.81% {
+    clip-path: inset(0 25% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  82.14% {
+    clip-path: inset(0 16.6667% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  90.48% {
+    clip-path: inset(0 8.3333% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  95% {
+    /* Beat before the full stop lands: the last character is held briefly. */
+    clip-path: inset(0 8.3333% 0 0);
+    animation-timing-function: steps(1, end);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/*
+ * Caret. `position: absolute` is the whole point: an in-flow caret would add
+ * inline width, and since the word sits at a line end that extra width would
+ * push the word onto the next line — a layout shift. Out of flow, it adds
+ * nothing, so the blink cannot move anything on the page.
+ *
+ * Because `clip-path` on the word would also clip a caret nested inside it,
+ * the caret is a SIBLING of the clipped span (see the component), not a child.
+ *
+ * Shape: a thin vertical bar (`▌`, ~0.08em wide, sized to the cap height)
+ * rather than `|` or `_` — a bar the weight of the letter strokes reads as a
+ * terminal caret without looking like a stray character, and it does not
+ * collide with the baseline descenders or the period.
+ *
+ * Colour: `--foreground`, not `--signal`. The headline is ink on canvas; a
+ * green caret would read as a second, competing accent in a palette that only
+ * has one (Signal is reserved for interactive affordances such as the focus
+ * ring).
+ *
+ * Lifetime: it blinks three times and then fades out completely — it does NOT
+ * keep blinking forever (that is a distraction on a page whose job is to show
+ * photographs) and it does NOT stop while still painted (a frozen caret reads
+ * as a rendering bug). `forwards` holds the final, fully transparent state.
+ */
+.denslab-hero-caret {
+  position: absolute;
+  /* Sits at the trailing edge of the word, which the wrapper already sized. */
+  left: 100%;
+  /* Aligns the bar with the baseline text, not the line box. */
+  bottom: 0.15em;
+  width: 0.08em;
+  height: 0.85em;
+  background-color: var(--foreground);
+  animation: denslab-hero-caret 1050ms linear 840ms both;
+}
+
+@keyframes denslab-hero-caret {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  /*
+   * Blink on/off three times (six half-cycles appears as three full blinks),
+   * then fade to nothing over the last slice so it disappears deliberately
+   * rather than snapping out mid-blink.
+   */
+  8%,
+  25% {
+    opacity: 1;
+  }
+  16%,
+  33% {
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  55%,
+  80% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 0;
+  }
+}
+
+/*
+ * The hero honours `prefers-reduced-motion`. This used to be the opposite: an
+ * `!important` override here forced the 840ms duration back on for reduced-motion
+ * visitors, on the explicit argument that a visible typing effect was the point
+ * of the feature. Deny revisited that call and reversed it — accessibility wins
+ * over the flourish, and the hero now behaves like the wordmark.
+ *
+ * There is no override block any more, on purpose. The blanket rule near the top
+ * of this file (`@media (prefers-reduced-motion: reduce)`, duration 0.01ms)
+ * now applies to `.denslab-hero-type` and `.denslab-hero-caret` like it does to
+ * everything else: for those visitors the word is simply painted complete on the
+ * first frame and the caret never blinks. That is the intended, correct outcome —
+ * not a bug to "restore" by re-adding an override.
+ *
+ * Note the timing-function split, which is unrelated to this decision: the
+ * per-character cadence lives in the keyframes' own `steps(1, end)`, so
+ * shortening the duration does not smear the word — it just skips to the end.
+ */
+
