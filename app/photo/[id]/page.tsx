@@ -6,6 +6,7 @@ import { PromptPanel } from "@/components/prompt-panel";
 import { BookmarkButton } from "@/components/bookmark-button";
 import { DonateButton } from "@/components/donate-button";
 import { PostImage } from "@/components/post-image";
+import { PhotoLightbox } from "@/components/photo-lightbox";
 import { Badge } from "@/components/ui/badge";
 import { isBookmarked } from "@/lib/bookmarks";
 import {
@@ -78,17 +79,40 @@ export default async function PhotoDetailPage({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
         <div className="lg:col-span-2">
           <figure className="bg-card overflow-hidden rounded-xl border">
-            <PostImage
-              imgurId={post.imgurId}
-              alt={post.title}
-              width={post.width}
-              height={post.height}
-              sizes="(min-width: 1024px) 66vw, 100vw"
-              fullSize
-              priority
-              imageAvailable={imageAvailable}
-              className="h-auto w-full object-contain"
-            />
+            {/*
+             * Only portrait is capped (`max-h-[80vh]`) and only portrait gets the
+             * full-screen view. Landscape and square keep the column width and
+             * take whatever height that implies — Deny's call, with the
+             * consequence that a tall/landscape photo can be taller than a short
+             * viewport and needs scrolling. Horizontal overflow stays 0 either
+             * way, because the width still comes from the column.
+             *
+             * Portrait is detected from the stored width/height, so the decision
+             * is made on the server and never flickers. Square counts as
+             * landscape (it is not portrait), so it gets no full-screen view.
+             */}
+            {post.height > post.width ? (
+              <PhotoLightbox
+                imgurId={post.imgurId}
+                alt={post.title}
+                width={post.width}
+                height={post.height}
+                imageAvailable={imageAvailable}
+                sizes="(min-width: 1024px) 66vw, 100vw"
+              />
+            ) : (
+              <PostImage
+                imgurId={post.imgurId}
+                alt={post.title}
+                width={post.width}
+                height={post.height}
+                sizes="(min-width: 1024px) 66vw, 100vw"
+                fullSize
+                priority
+                imageAvailable={imageAvailable}
+                className="mx-auto h-auto w-full object-contain"
+              />
+            )}
           </figure>
         </div>
 
