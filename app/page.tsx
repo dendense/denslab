@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GalleryGrid } from "@/components/gallery-grid";
+import { HeroHeadline } from "@/components/hero-headline";
 import { Pagination } from "@/components/pagination";
 import { SearchBox } from "@/components/search-box";
 import { fetchPostPage } from "@/lib/posts-repository";
@@ -24,9 +25,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-14 lg:px-10">
       <header className="mb-8 max-w-2xl sm:mb-10">
-        <h1 className="text-3xl font-semibold tracking-tight leading-tight sm:text-4xl lg:text-5xl">
-          Visual stories from the edge of reality &amp; imagination.
-        </h1>
+        <HeroHeadline />
         <p className="text-muted-foreground mt-3 text-sm">
           {search ? (
             `${total} ${total === 1 ? "result" : "results"} for “${search}”`
@@ -54,7 +53,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
       <section aria-label="Photo gallery">
         {search && posts.length === 0 ? (
-          <div className="bg-card text-card-foreground rounded-xl border p-5 shadow-sm sm:p-6">
+          <div className="bg-card text-card-foreground rounded-xl border p-5 sm:p-6">
             <p className="text-lg font-semibold">
               Nothing matched “{search}”.
             </p>
