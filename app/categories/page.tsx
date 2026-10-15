@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { CATEGORIES, CATEGORY_SLUGS } from "@/lib/posts";
+import { CATEGORY_DESCRIPTIONS } from "@/lib/categories";
 import { fetchCategoryCounts } from "@/lib/posts-repository";
 import { Badge } from "@/components/ui/badge";
 
@@ -54,6 +55,9 @@ export default async function CategoriesPage() {
                     {category}
                   </h2>
                   <p className="text-muted-foreground text-sm">
+                    {CATEGORY_DESCRIPTIONS[category]}
+                  </p>
+                  <p className="text-muted-foreground font-mono text-sm">
                     {count} {count === 1 ? "entry" : "entries"}
                   </p>
                 </div>
