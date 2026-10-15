@@ -45,3 +45,6 @@ next-env.d.ts
 
 # local verification screenshots
 .yuki-shots/
+
+# local kanban verification artifacts (screenshots, reports, diffs), not part of the published project
+.kanban-artifacts/

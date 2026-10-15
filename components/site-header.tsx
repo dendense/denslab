@@ -220,13 +220,21 @@ export function SiteHeader() {
   );
 
   /*
-   * Floating navbar. `fixed` takes it out of the flow, so the spacer below
+   * Full-bleed bar. `fixed` takes it out of the flow, so the spacer below
    * replaces the height it used to occupy — that is what keeps the page content
    * from shifting when the header slides away (`translate` never affects layout).
-   * Spacer height mirrors the nav box exactly: gap (py-2/py-3) x2 + nav height.
+   * Spacer height mirrors the nav box exactly: header padding + nav height.
    * z-40 keeps it under the z-50 Sheet/Dialog/Dropdown overlays; the inner box
    * must not create a stacking context (no z, no transform) or the header's own
    * translate would be trapped inside it and the Sheet would slide under the bar.
+   *
+   * No container: the old `px-2 py-2 sm:px-4 sm:py-3` on this element was what
+   * made the bar read as a floating card (inset 8/16px from the sides, 8/12px
+   * from the top), and the previous `rounded-xl shadow-sm` sat on top of that.
+   * Dropping the radius and shadow but keeping that padding would still have
+   * left a detached box, so the padding goes too — the bar now sits flush.
+   * `py-2 sm:py-3` stays because that is vertical breathing room *inside* the
+   * bar, not a gap to the viewport edge.
    */
   return (
     <>
@@ -244,23 +252,24 @@ export function SiteHeader() {
         className="h-[68px] sm:h-[72px]"
       />
       <header
-        className={`fixed inset-x-0 top-0 z-40 px-2 py-2 sm:px-4 sm:py-3 ${
+        className={`fixed inset-x-0 top-0 z-40 py-2 sm:py-3 ${
           hidden ? "-translate-y-[150%]" : "translate-y-0"
         } focus-within:translate-y-0 motion-reduce:translate-y-0 motion-reduce:transition-none transition-transform duration-300 ease-out`}
       >
         <nav
           aria-label="Main navigation"
           data-surface={navSurface}
-          className="relative flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 shadow-sm sm:px-4 lg:px-8"
+          className="relative flex w-full items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-10"
         >
           {/* Gradient wash behind the translucent surface. The nav sits over
               page content, so this is what guarantees the labels stay readable
               when a bright image passes under it — same trade as
               shadcn/Radix's navigation-menu. `pointer-events-none` keeps it out
-              of the way of the links above it. */}
+              of the way of the links above it. No radius: the bar is flush with
+              the viewport now, so a rounded wash would show as a clipped edge. */}
           <div
             aria-hidden="true"
-            className="bg-gradient-to-b from-transparent to-black/5 dark:to-black/30 pointer-events-none absolute inset-0 rounded-xl"
+            className="bg-gradient-to-b from-transparent to-black/5 dark:to-black/30 pointer-events-none absolute inset-0"
           />
           <DenslabWordmarkLink />
 
@@ -272,8 +281,14 @@ export function SiteHeader() {
             <ThemeToggle />
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
+                {/* ARAH B "Mono Grid" (Deny). `variant="technical"` is a CVA
+                    variant in components/ui/button.tsx, not a fork — the size
+                    stays `h-11 w-11` (44x44, WCAG 2.5.8 AAA), the label stays,
+                    and `rounded-none` is carried by the variant itself. Only
+                    this trigger changes; Login/Donate/ThemeToggle/Search keep
+                    their own variants. */}
                 <Button
-                  variant="outline"
+                  variant="technical"
                   size="icon"
                   className="h-11 w-11"
                   aria-label="Open menu"
