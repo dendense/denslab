@@ -58,7 +58,14 @@ export function DonateButton() {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-h-[90vh] w-full max-w-3xl overflow-y-auto">
+      {/*
+        Height is capped on the PANEL so a visible margin stays above and below
+        it on phones (80vh instead of 90vh); desktop keeps the old 90vh, which
+        never binds there. Scrolling is moved to the inner wrapper below: if the
+        panel itself scrolled, the absolutely positioned close button would
+        scroll out of view with the content.
+      */}
+      <DialogContent className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden sm:max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Support denslab</DialogTitle>
           <DialogDescription>
@@ -66,47 +73,49 @@ export function DonateButton() {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-          {OPTIONS.map((option) => (
-            <Card key={option.id} className="flex flex-col">
-              <div className="space-y-1 p-4">
-                <h3 className="text-base font-semibold leading-none font-mono">
-                  {option.label}
-                </h3>
-                <p className="text-muted-foreground text-sm">
-                  {option.caption}
-                </p>
-              </div>
-
-              <div className="px-4">
-                <div className="rounded-md border bg-white">
-                  <Image
-                    src={option.image}
-                    alt={option.alt}
-                    width={480}
-                    height={480}
-                    sizes="(min-width: 640px) 40vw, 90vw"
-                    className="h-auto w-full object-contain"
-                  />
-                </div>
-              </div>
-
-              {option.address && (
-                <div className="mt-auto space-y-2 p-4">
-                  <p className="text-sm font-medium leading-none">
-                    Wallet address
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+            {OPTIONS.map((option) => (
+              <Card key={option.id} className="flex flex-col">
+                <div className="space-y-1 p-4">
+                  <h3 className="text-base font-semibold leading-none font-mono">
+                    {option.label}
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    {option.caption}
                   </p>
-                  <AddressField address={option.address} />
                 </div>
-              )}
-            </Card>
-          ))}
-        </div>
 
-        <p className="text-muted-foreground text-sm">
-          Only send USDT on the TRC20 network to the address above. Funds sent on
-          another network cannot be recovered.
-        </p>
+                <div className="px-4">
+                  <div className="rounded-md border bg-white">
+                    <Image
+                      src={option.image}
+                      alt={option.alt}
+                      width={480}
+                      height={480}
+                      sizes="(min-width: 640px) 40vw, 90vw"
+                      className="h-auto w-full object-contain"
+                    />
+                  </div>
+                </div>
+
+                {option.address && (
+                  <div className="mt-auto space-y-2 p-4">
+                    <p className="text-sm font-medium leading-none">
+                      Wallet address
+                    </p>
+                    <AddressField address={option.address} />
+                  </div>
+                )}
+              </Card>
+            ))}
+          </div>
+
+          <p className="text-muted-foreground text-sm">
+            Only send USDT on the TRC20 network to the address above. Funds sent
+            on another network cannot be recovered.
+          </p>
+        </div>
       </DialogContent>
     </Dialog>
   );
