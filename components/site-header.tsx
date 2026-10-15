@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { DenslabWordmarkLink } from "@/components/denslab-wordmark-link";
-import { navSurface } from "@/components/site-footer";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -17,7 +16,6 @@ import {
 } from "@/components/ui/sheet";
 import { createClient } from "@/lib/supabase/client";
 import { shortenUsername } from "@/lib/format-username";
-import { useScrollDirection } from "@/lib/use-scroll-direction";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 
@@ -174,7 +172,6 @@ export function SiteHeader() {
   const pathname = usePathname();
   const user = useSessionUser();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const hidden = useScrollDirection();
 
   const items = (
     <>
@@ -199,6 +196,32 @@ export function SiteHeader() {
           Admin
         </NavItem>
       )}
+      {/*
+       * Portfolio is an outbound link (Deny will point it at another site
+       * later), so it is a plain <a> — not next/link's <Link>, which is for
+       * in-app navigation and would prefetch a route that does not exist.
+       * href="#" is a deliberate placeholder until Deny supplies the real URL.
+       * rel="noopener noreferrer" pairs with target="_blank" so the opened
+       * page cannot reach back through window.opener.
+       *
+       * Class list is copied verbatim from NavItem's inactive branch rather
+       * than reusing NavItem itself, because NavItem only renders <Link>.
+       * Same h-11 row height, so the bar does not grow.
+       */}
+      <li>
+        <a
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(
+            navLink,
+            "rounded-md px-4 transition-colors",
+            "text-foreground/80 hover:bg-accent hover:text-accent-foreground",
+          )}
+        >
+          Portfolio
+        </a>
+      </li>
       <li>
         {user ? (
           <AccountMenu user={user} />
@@ -220,13 +243,17 @@ export function SiteHeader() {
   );
 
   /*
-   * Full-bleed bar. `fixed` takes it out of the flow, so the spacer below
-   * replaces the height it used to occupy — that is what keeps the page content
-   * from shifting when the header slides away (`translate` never affects layout).
-   * Spacer height mirrors the nav box exactly: header padding + nav height.
-   * z-40 keeps it under the z-50 Sheet/Dialog/Dropdown overlays; the inner box
-   * must not create a stacking context (no z, no transform) or the header's own
-   * translate would be trapped inside it and the Sheet would slide under the bar.
+   * Full-bleed bar, in normal document flow (`static`).
+   *
+   * Was `fixed` + `translateY` auto-hide: that took the bar out of the flow and
+   * forced a spacer div to reserve its height (Deny: "jangan jadikan floating").
+   * `static` is the literal reading of "not floating": the bar occupies its own
+   * space in the document, so no spacer and no compensation math. Nothing can
+   * slide it away any more, so the translate classes, the transition, and
+   * `useScrollDirection` are gone with it.
+   *
+   * No `sticky` either: the bar is a plain block at the top of the document and
+   * Deny did not ask for it to remain pinned while scrolling.
    *
    * No container: the old `px-2 py-2 sm:px-4 sm:py-3` on this element was what
    * made the bar read as a floating card (inset 8/16px from the sides, 8/12px
@@ -235,42 +262,20 @@ export function SiteHeader() {
    * left a detached box, so the padding goes too — the bar now sits flush.
    * `py-2 sm:py-3` stays because that is vertical breathing room *inside* the
    * bar, not a gap to the viewport edge.
+   *
+   * `bg-background` is the separator now that the frosted surface is gone: the
+   * bar is opaque and page-coloured, so what separates it from the content is a
+   * `border-b border-border` hairline. Without it the nav and `<main>` would be
+   * the same colour with no seam (the old gradient wash only existed to keep a
+   * translucent surface readable and is meaningless over an opaque one).
+   * z-40 stays: the Sheet still has to slide over the bar.
    */
   return (
-    <>
-      {/*
-        Spacer height = header padding-top + nav box height (measured, not
-        guessed): nav is h-11 (44px) + py-2 (16px) = 60px with no border. Header
-        adds py-2 (8px) below 640px and py-3 (12px) from 640px up, so the
-        reserved space is 68px / 72px. The old 70/74 still counted the 2px
-        border the surface no longer has; leaving them would have shifted the
-        page 2px down. Keep in sync if the nav box changes size or the content
-        jumps by the difference when the bar slides away.
-      */}
-      <div
-        aria-hidden="true"
-        className="h-[68px] sm:h-[72px]"
-      />
-      <header
-        className={`fixed inset-x-0 top-0 z-40 py-2 sm:py-3 ${
-          hidden ? "-translate-y-[150%]" : "translate-y-0"
-        } focus-within:translate-y-0 motion-reduce:translate-y-0 motion-reduce:transition-none transition-transform duration-300 ease-out`}
+    <header className="z-40 border-b border-border bg-background py-2 sm:py-3">
+      <nav
+        aria-label="Main navigation"
+        className="relative flex w-full items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-10"
       >
-        <nav
-          aria-label="Main navigation"
-          data-surface={navSurface}
-          className="relative flex w-full items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-10"
-        >
-          {/* Gradient wash behind the translucent surface. The nav sits over
-              page content, so this is what guarantees the labels stay readable
-              when a bright image passes under it — same trade as
-              shadcn/Radix's navigation-menu. `pointer-events-none` keeps it out
-              of the way of the links above it. No radius: the bar is flush with
-              the viewport now, so a rounded wash would show as a clipped edge. */}
-          <div
-            aria-hidden="true"
-            className="bg-gradient-to-b from-transparent to-black/5 dark:to-black/30 pointer-events-none absolute inset-0"
-          />
           <DenslabWordmarkLink />
 
           {/* Desktop navigation */}
@@ -281,14 +286,14 @@ export function SiteHeader() {
             <ThemeToggle />
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
-                {/* ARAH B "Mono Grid" (Deny). `variant="technical"` is a CVA
-                    variant in components/ui/button.tsx, not a fork — the size
-                    stays `h-11 w-11` (44x44, WCAG 2.5.8 AAA), the label stays,
-                    and `rounded-none` is carried by the variant itself. Only
-                    this trigger changes; Login/Donate/ThemeToggle/Search keep
-                    their own variants. */}
+                {/* Mobile menu trigger. `default` is the nearest fit: the
+                    trigger sits beside `ThemeToggle` with no other filled
+                    control, so `ghost` would leave a bare glyph. Size stays
+                    `h-11 w-11` (44x44, WCAG 2.5.8), label stays, and
+                    `rounded-none` comes from the Button base. Only this trigger
+                    changes; Login/Donate/ThemeToggle/Search keep their own. */}
                 <Button
-                  variant="technical"
+                  variant="default"
                   size="icon"
                   className="h-11 w-11"
                   aria-label="Open menu"
@@ -312,8 +317,7 @@ export function SiteHeader() {
             </Sheet>
           </div>
         </nav>
-      </header>
-    </>
+    </header>
   );
 }
 
