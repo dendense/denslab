@@ -35,6 +35,16 @@ export type PostCardData = {
   category: PostCategory;
   tags: string[];
   /**
+   * Upload timestamp, straight from the `posts.created_at` column.
+   *
+   * Kept as the raw ISO string rather than a `Date`: the card formats it for
+   * WIB in a Server Component, and two devices in different zones must produce
+   * the same text. Nullable because the local demo dataset predates the column,
+   * and a card must render a title without a date rather than a dangling
+   * separator.
+   */
+  createdAt: string | null;
+  /**
    * Whether the Imgur id resolves, decided on the server. The browser cannot
    * determine this, so the card must not try to guess.
    */
@@ -50,6 +60,7 @@ type CardRow = {
   height: number;
   category: PostCategory;
   tags: string[] | null;
+  created_at: string | null;
 };
 
 type FullRow = CardRow & {
@@ -65,7 +76,7 @@ export type PostPage = {
 };
 
 const CARD_COLUMNS =
-  "id, title, description, imgur_id, width, height, category, tags";
+  "id, title, description, imgur_id, width, height, category, tags, created_at";
 
 const FULL_COLUMNS = `${CARD_COLUMNS}, metadata, photo_metadata`;
 
@@ -85,6 +96,7 @@ function toCard(row: CardRow): PostCardData {
     orientation: orientationOf(row.width, row.height),
     category: row.category,
     tags: row.tags ?? [],
+    createdAt: row.created_at ?? null,
     // Replaced below once the Imgur verdict is known.
     imageAvailable: true,
   };
@@ -105,7 +117,13 @@ async function toCardsWithAvailability(
   }));
 }
 
-/** Local fallback uses the demo dataset until the table is seeded. */
+/**
+ * Local fallback uses the demo dataset until the table is seeded.
+ *
+ * `createdAt` is null here on purpose: the demo rows in lib/posts.ts carry no
+ * timestamp, and inventing one would put a fabricated upload date in front of
+ * a real reader. The card omits the date when this is null.
+ */
 function demoCards(): PostCardData[] {
   return demoPosts.map((post) => ({
     id: post.id,
@@ -117,6 +135,7 @@ function demoCards(): PostCardData[] {
     orientation: post.orientation,
     category: post.category,
     tags: post.tags,
+    createdAt: null,
     // Demo ids may not resolve; the client's onError catches any that do not.
     imageAvailable: true,
   }));

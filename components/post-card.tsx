@@ -7,6 +7,11 @@ import { useState } from "react";
 import { PostImage } from "@/components/post-image";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  TITLE_DATE_SEPARATOR,
+  formatWibDate,
+  wibIsoDate,
+} from "@/lib/format-date";
 import type { PostCardData } from "@/lib/posts-repository";
 
 export const cardVariants: Variants = {
@@ -28,6 +33,16 @@ export function PostCard({
 }) {
   const [loaded, setLoaded] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+
+  /*
+   * Formatting runs inside the client component rather than on the server.
+   *
+   * Both sides call the same pure function on the same ISO string, and it reads
+   * the zone offset from a constant instead of from the ambient locale, so the
+   * two render passes cannot disagree. Doing it here also keeps the date with
+   * the markup that shows it, so a future card variant cannot forget it.
+   */
+  const date = formatWibDate(post.createdAt);
 
   return (
     <motion.article
@@ -75,10 +90,42 @@ export function PostCard({
         <div className="flex items-center justify-between gap-2 p-3 sm:gap-3 sm:p-4">
           <h2 className="text-base font-semibold leading-snug sm:text-lg">
             {post.title}
+            {/*
+              The separator lives inside the date branch, so a post with no
+              timestamp renders a bare title instead of a trailing bullet.
+              No `font-mono` here: the card title is not monospace, so a
+              monospace date would be the only monospace element in the card.
+            */}
+            {date && (
+              <>
+                <span aria-hidden="true">{TITLE_DATE_SEPARATOR}</span>
+                {/*
+                  `<time>` rather than a `<span>`: the visible text is
+                  dd/mm/yyyy, which assistive tech reads as three bare numbers,
+                  while `dateTime` carries the unambiguous WIB calendar day.
+                */}
+                <time
+                  dateTime={wibIsoDate(post.createdAt) ?? undefined}
+                  className="text-muted-foreground font-normal"
+                >
+                  {date}
+                </time>
+              </>
+            )}
           </h2>
 
-          <Badge className="shrink-0">
-            Details
+          {/*
+            Wide screens have the narrowest column (280px at 1280) and the
+            "Details" label alone costs 59px of it, which pushes the date onto
+            a second line. Hiding just the label returns 24px to the title and
+            benefits the four shorter titles; the arrow keeps the affordance
+            and the accessible name keeps the meaning.
+
+            Below `lg` the column is wider, so the label stays visible and
+            mobile layout is untouched.
+          */}
+          <Badge className="shrink-0 lg:px-2" aria-label="Details">
+            <span className="lg:sr-only">Details</span>
             <ArrowRight className="h-3 w-3" aria-hidden="true" />
           </Badge>
         </div>

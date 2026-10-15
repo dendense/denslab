@@ -41,6 +41,7 @@ type BookmarkRow = {
     height: number;
     category: PostCardData["category"];
     tags: string[] | null;
+    created_at: string | null;
   } | null;
 };
 
@@ -69,7 +70,7 @@ export async function fetchBookmarkedPosts(): Promise<PostCardData[]> {
   const { data, error } = await supabase
     .from("bookmarks")
     .select(
-      "created_at, posts (id, title, description, imgur_id, width, height, category, tags)",
+      "created_at, posts (id, title, description, imgur_id, width, height, category, tags, created_at)",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
@@ -96,6 +97,7 @@ export async function fetchBookmarkedPosts(): Promise<PostCardData[]> {
     orientation: orientationOf(post.width, post.height),
     category: post.category,
     tags: post.tags ?? [],
+    createdAt: post.created_at ?? null,
     imageAvailable: availability[post.imgur_id] ?? true,
   }));
 }
