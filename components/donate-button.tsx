@@ -64,8 +64,12 @@ export function DonateButton() {
         never binds there. Scrolling is moved to the inner wrapper below: if the
         panel itself scrolled, the absolutely positioned close button would
         scroll out of view with the content.
+
+        Width uses `w-` and not `max-w-`: an `sm:max-w-3xl` cap goes full-bleed
+        on every viewport between 640 and 768. A plain `max-w-3xl` stays as the
+        desktop cap and lets `calc` keep 32px per side below it.
       */}
-      <DialogContent className="flex max-h-[80vh] w-full max-w-3xl flex-col overflow-hidden sm:max-h-[90vh]">
+      <DialogContent className="flex max-h-[80vh] w-[calc(100%-4rem)] max-w-3xl flex-col overflow-hidden sm:max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Support denslab</DialogTitle>
           <DialogDescription>
