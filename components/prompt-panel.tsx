@@ -175,9 +175,11 @@ export function PromptPanel({
         </div>
 
         {!isAuthenticated && (
-          <div className="bg-background mt-4 flex flex-col items-center gap-3 border-t pt-5 text-center sm:pt-6">
+          <div className="bg-background mt-4 flex flex-col items-center gap-3 border-t py-5 text-center sm:py-6">
             <p className="max-w-xs text-sm font-medium sm:text-base">{cta}</p>
-            <Button asChild>
+            {/* h-11 = 44px (WCAG 2.5.8 comfortable target); size.lg is h-10 so
+                the class is set here rather than changing the global scale. */}
+            <Button asChild className="h-11">
               <Link href="/login">
                 <Lock aria-hidden="true" />
                 {ctaButton}
