@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { safeNextPath } from "@/lib/safe-next";
 
 /**
  * Google redirects here with a `code`, which is exchanged for a session.
@@ -9,10 +10,10 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
 
-  // Only allow same-origin relative redirects.
-  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  // Same-origin path only — one helper shared with /login, so the rules cannot
+  // drift between the two places that read `next`.
+  const safeNext = safeNextPath(searchParams.get("next"));
 
   if (!code) {
     return NextResponse.redirect(`${origin}/login?error=missing_code`);

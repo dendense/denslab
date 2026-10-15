@@ -180,7 +180,9 @@ export function PromptPanel({
             {/* h-11 = 44px (WCAG 2.5.8 comfortable target); size.lg is h-10 so
                 the class is set here rather than changing the global scale. */}
             <Button asChild className="h-11">
-              <Link href="/login">
+              {/* `next` is the post being read, so signing in returns there
+                  instead of dropping the reader on the gallery. */}
+              <Link href={`/login?next=${encodeURIComponent(`/photo/${post.id}`)}`}>
                 <Lock aria-hidden="true" />
                 {ctaButton}
               </Link>

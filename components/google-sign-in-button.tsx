@@ -8,7 +8,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
  * Google OAuth is the only sign-in method, so this is a single button rather
  * than a list of providers.
  */
-export function GoogleSignInButton() {
+export function GoogleSignInButton({ next }: { next?: string } = {}) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +28,9 @@ export function GoogleSignInButton() {
     const { error: signInError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        // Google returns to /auth/callback; carry `next` through the round trip
+        // so the reader lands back on the post they came from.
+        redirectTo: `${window.location.origin}/auth/callback${next ? `?next=${encodeURIComponent(next)}` : ""}`,
       },
     });
 
