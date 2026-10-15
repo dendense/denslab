@@ -90,7 +90,15 @@ export function DonateButton() {
                   </p>
                 </div>
 
-                <div className="px-4">
+                {/* `pb-4` below `sm`: in the single-column layout the DANA card
+                    has no address section under the image, so the QR code ends
+                    up flush against the card's bottom edge. 16px matches the
+                    card's horizontal padding, so the image is inset the same on
+                    all sides. From `sm` up the grid is two columns and both
+                    cards stretch to the taller USDT card, which already leaves
+                    space below the image — padding there would only grow the
+                    panel. */}
+                <div className="px-4 pb-4 sm:pb-0">
                   <div className="rounded-md border bg-white">
                     <Image
                       src={option.image}
