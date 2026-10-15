@@ -67,7 +67,7 @@ export default async function CategoryPage({
 
         <Badge>Category</Badge>
 
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight leading-tight sm:text-4xl lg:text-5xl">
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight leading-tight sm:text-4xl lg:text-5xl font-mono">
           {category}
         </h1>
         <p className="text-muted-foreground mt-3 text-sm">
@@ -94,7 +94,7 @@ export default async function CategoryPage({
 
       <section aria-label={`${category} gallery`}>
         {search && posts.length === 0 ? (
-          <div className="bg-card text-card-foreground rounded-xl border p-5 shadow-sm sm:p-6">
+          <div className="bg-card text-card-foreground rounded-xl border p-5 sm:p-6">
             <p className="text-lg font-semibold">
               Nothing matched “{search}” in {category}.
             </p>

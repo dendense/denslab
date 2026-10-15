@@ -36,7 +36,7 @@ export function PostCard({
       whileInView="visible"
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="bg-card text-card-foreground group mb-4 block break-inside-avoid overflow-hidden rounded-xl border shadow-sm sm:mb-5 lg:mb-6"
+      className="bg-card text-card-foreground group mb-4 block break-inside-avoid overflow-hidden rounded-xl border sm:mb-5 lg:mb-6"
     >
       <Link href={`/photo/${post.id}`} className="block">
         <div className="relative">

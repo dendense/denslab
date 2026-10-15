@@ -34,10 +34,10 @@ export default async function LoginPage() {
           Back to gallery
         </Link>
 
-        <section className="bg-card text-card-foreground rounded-xl border p-6 shadow-sm sm:p-8">
+        <section className="bg-card text-card-foreground rounded-xl border p-6 sm:p-8">
           <header className="mb-6 space-y-2">
             <Badge>denslab account</Badge>
-            <h1 className="text-2xl font-semibold leading-tight sm:text-3xl">
+            <h1 className="text-2xl font-semibold leading-tight sm:text-3xl font-mono">
               Sign in to unlock prompts
             </h1>
             <p className="text-muted-foreground text-sm">

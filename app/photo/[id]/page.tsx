@@ -77,7 +77,7 @@ export default async function PhotoDetailPage({
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
         <div className="lg:col-span-2">
-          <figure className="bg-card overflow-hidden rounded-xl border shadow-sm">
+          <figure className="bg-card overflow-hidden rounded-xl border">
             <PostImage
               imgurId={post.imgurId}
               alt={post.title}
@@ -124,15 +124,15 @@ export default async function PhotoDetailPage({
 
             <dl className="grid grid-cols-2 gap-2 border-t border-border pt-4 text-xs">
               <div>
-                <dt className="text-xs font-medium">
+                <dt className="text-xs font-medium font-mono">
                   Resolution
                 </dt>
-                <dd>
+                <dd className="font-mono">
                   {post.width} × {post.height}
                 </dd>
               </div>
               <div>
-                <dt className="text-xs font-medium">
+                <dt className="text-xs font-medium font-mono">
                   Orientation
                 </dt>
                 <dd className="capitalize">{post.orientation}</dd>

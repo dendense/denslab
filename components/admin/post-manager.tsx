@@ -68,7 +68,7 @@ export function PostManager({ posts }: { posts: Row[] }) {
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold sm:text-xl">Posts</h2>
+        <h2 className="text-lg font-semibold sm:text-xl font-mono">Posts</h2>
         <Button type="button" onClick={() => setMode({ kind: "create" })}>
           <Plus aria-hidden="true" />
           New post
@@ -137,7 +137,7 @@ export function PostManager({ posts }: { posts: Row[] }) {
           className="bg-background/80 fixed inset-0 z-50 flex items-center justify-center p-4"
         >
           <div className="bg-background w-full max-w-md rounded-lg border p-6 shadow-lg">
-            <h3 id="confirm-delete-heading" className="text-lg font-semibold">
+            <h3 id="confirm-delete-heading" className="text-lg font-semibold font-mono">
               Delete this post?
             </h3>
             <p className="text-muted-foreground mt-2 text-sm">

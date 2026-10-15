@@ -70,7 +70,7 @@ export function DonateButton() {
           {OPTIONS.map((option) => (
             <Card key={option.id} className="flex flex-col">
               <div className="space-y-1 p-4">
-                <h3 className="text-base font-semibold leading-none">
+                <h3 className="text-base font-semibold leading-none font-mono">
                   {option.label}
                 </h3>
                 <p className="text-muted-foreground text-sm">

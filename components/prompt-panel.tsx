@@ -47,7 +47,7 @@ function PromptText({ label, text }: { label: string; text: string }) {
 
   return (
     <div className="space-y-1.5">
-      <p className="text-sm font-medium leading-none">{label}</p>
+      <p className="text-sm font-medium leading-none font-mono">{label}</p>
       <p
         id={contentId}
         className={`break-words font-mono text-xs leading-relaxed ${
@@ -160,7 +160,7 @@ export function PromptPanel({
             <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {fields.map(({ key, label }) => (
                 <div key={key} className="space-y-1">
-                  <dt className="text-sm font-medium leading-none">{label}</dt>
+                  <dt className="text-sm font-medium leading-none font-mono">{label}</dt>
                   <dd className="break-all font-mono text-xs">
                     {isAi
                       ? String(post.metadata[key as keyof AiMetadata])

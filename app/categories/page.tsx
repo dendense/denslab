@@ -29,7 +29,7 @@ export default async function CategoriesPage() {
           <span>Categories</span>
         </nav>
 
-        <h1 className="text-3xl font-semibold tracking-tight leading-tight sm:text-4xl lg:text-5xl">
+        <h1 className="text-3xl font-semibold tracking-tight leading-tight sm:text-4xl lg:text-5xl font-mono">
           Browse by category
         </h1>
         <p className="text-muted-foreground mt-3 text-sm">
@@ -46,11 +46,11 @@ export default async function CategoriesPage() {
             <li key={category}>
               <Link
                 href={`/categories/${CATEGORY_SLUGS[category]}`}
-                className="bg-card text-card-foreground flex h-full flex-col justify-between gap-6 rounded-xl border p-6 shadow-sm transition-colors"
+                className="bg-card text-card-foreground flex h-full flex-col justify-between gap-6 rounded-xl border p-6 transition-colors"
               >
                 <div className="space-y-2">
                   <Badge>Category</Badge>
-                  <h2 className="text-2xl font-semibold leading-tight sm:text-3xl">
+                  <h2 className="text-2xl font-semibold leading-tight sm:text-3xl font-mono">
                     {category}
                   </h2>
                   <p className="text-muted-foreground text-sm">

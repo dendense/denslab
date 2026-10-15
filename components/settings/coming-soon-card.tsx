@@ -27,7 +27,7 @@ export function ComingSoonCard({
 
         <div className="min-w-0 space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-base font-semibold leading-none">{title}</h3>
+            <h3 className="text-base font-semibold leading-none font-mono">{title}</h3>
             <Badge>
               <Lock className="h-3 w-3" aria-hidden="true" />
               Coming soon

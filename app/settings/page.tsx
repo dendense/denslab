@@ -50,7 +50,7 @@ export default async function SettingsPage() {
       <div className="mx-auto w-full max-w-3xl space-y-6 sm:space-y-8">
         <header className="space-y-2 border-b border-border pb-6">
           <Badge>Account</Badge>
-          <h1 className="text-3xl font-semibold tracking-tight leading-tight sm:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight leading-tight sm:text-4xl font-mono">
             Settings
           </h1>
           <p className="text-muted-foreground text-sm">
@@ -58,15 +58,15 @@ export default async function SettingsPage() {
           </p>
         </header>
 
-        <section className="bg-card text-card-foreground rounded-xl border p-4 shadow-sm sm:p-6">
-          <h2 className="mb-4 text-lg font-semibold sm:text-xl">
+        <section className="bg-card text-card-foreground rounded-xl border p-4 sm:p-6">
+          <h2 className="mb-4 text-lg font-semibold sm:text-xl font-mono">
             Profile
           </h2>
           <UsernameForm initialName={displayNameOf(user)} />
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold sm:text-xl">
+          <h2 className="text-lg font-semibold sm:text-xl font-mono">
             Upcoming
           </h2>
 
@@ -86,7 +86,7 @@ export default async function SettingsPage() {
               </span>
 
               <div className="min-w-0 space-y-1.5">
-                <h3 className="text-lg font-semibold">
+                <h3 className="text-lg font-semibold font-mono">
                   Bookmarks
                 </h3>
                 <p className="text-muted-foreground text-sm">

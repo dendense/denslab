@@ -25,7 +25,7 @@ export default async function AdminPage() {
   if (!viewer.isAdmin) {
     return (
       <main className="w-full flex-1 px-4 py-10 sm:px-6 sm:py-16 lg:px-10">
-        <section className="bg-card text-card-foreground mx-auto w-full max-w-md rounded-xl border p-6 shadow-sm sm:p-8">
+        <section className="bg-card text-card-foreground mx-auto w-full max-w-md rounded-xl border p-6 sm:p-8">
           <div className="flex items-start gap-3">
             <span
               aria-hidden="true"
@@ -34,7 +34,7 @@ export default async function AdminPage() {
               <ShieldX className="h-4 w-4" />
             </span>
             <div className="space-y-2">
-              <h1 className="text-2xl font-semibold">Admins only</h1>
+              <h1 className="text-2xl font-semibold font-mono">Admins only</h1>
               <p className="text-muted-foreground text-sm">
                 This account does not have the admin role. Signed in as{" "}
                 {viewer.email ?? "your account"}.
@@ -61,7 +61,7 @@ export default async function AdminPage() {
       <div className="mx-auto w-full max-w-5xl space-y-6 sm:space-y-8">
         <header className="space-y-2 border-b border-border pb-6">
           <Badge>Admin</Badge>
-          <h1 className="text-3xl font-semibold tracking-tight leading-tight sm:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight leading-tight sm:text-4xl font-mono">
             Manage posts
           </h1>
           <p className="text-muted-foreground text-sm">

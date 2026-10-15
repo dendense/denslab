@@ -30,7 +30,7 @@ export default async function BookmarksPage() {
       <header className="mb-8 max-w-2xl sm:mb-10">
         <Badge>Saved</Badge>
 
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight leading-tight sm:text-4xl lg:text-5xl">
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight leading-tight sm:text-4xl lg:text-5xl font-mono">
           Bookmarks
         </h1>
         <p className="text-muted-foreground mt-3 text-sm">
@@ -41,7 +41,7 @@ export default async function BookmarksPage() {
       </header>
 
       {posts.length === 0 ? (
-        <div className="bg-card text-card-foreground rounded-xl border p-5 shadow-sm sm:p-6">
+        <div className="bg-card text-card-foreground rounded-xl border p-5 sm:p-6">
           <div className="flex items-start gap-3">
             <span
               aria-hidden="true"

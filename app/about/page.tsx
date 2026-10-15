@@ -36,7 +36,7 @@ export default function AboutPage() {
           imagination finds an audience and inspiration keeps moving.
         </p>
 
-        <figure className="bg-card overflow-hidden rounded-xl border shadow-sm">
+        <figure className="bg-card overflow-hidden rounded-xl border">
           <Image
             src="https://i.imgur.com/syCkh06.jpeg"
             alt={aboutImage.title}

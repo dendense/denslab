@@ -16,7 +16,7 @@ export const navSurface = "frosted";
  */
 export function SiteFooter() {
   return (
-    <footer data-surface={navSurface} className="mt-auto shadow-sm">
+    <footer data-surface={navSurface} className="mt-auto">
       {/* Full-bleed wash. The surface is borderless and translucent, so this is
           what keeps the text legible when bright content passes underneath. */}
       <div
