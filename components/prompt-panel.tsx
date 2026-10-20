@@ -146,7 +146,7 @@ export function PromptPanel({
       </CardHeader>
 
       <CardContent>
-        <div aria-hidden={!isAuthenticated} className="space-y-4 select-none blur-[6px]">
+        <div aria-hidden={!isAuthenticated} className={`space-y-4 ${isAuthenticated ? "" : "select-none blur-[6px]"}`}>
           {hasValue(prompt) && <PromptText label="Positive prompt" text={prompt} />}
 
           {hasValue(negativePrompt) && (
