@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# denslab
 
-## Getting Started
+Situs portfolio personal untuk karya AI-generated dan fotografi konseptual. Setiap karya
+menyimpan metadata aslinya — prompt, model, platform, seed untuk gambar AI; body, lensa,
+aperture, shutter speed, ISO untuk foto kamera. Metadata itu hanya terbuka untuk pengguna
+yang login.
 
-First, run the development server:
+## Status
+
+Aplikasi berjalan: Next.js 16.3.6 (App Router), React 19.2.8, Tailwind CSS v4, Supabase
+(PostgreSQL + Auth). Galeri, pencarian, pagination, kategori, bookmark, login Google, dan
+panel admin sudah ada di kode. Tidak ada CI di repo ini (tidak ada `.github/`) dan tidak ada
+test suite — verifikasi lewat `npm run lint`, `npx tsc --noEmit`, `npm run build`. Ada dua
+self-check di luar build (`tsconfig` → `exclude`): `node --experimental-strip-types
+lib/format-date.selfcheck.ts` bisa langsung jalan; `lib/categories.selfcheck.ts` butuh `tsx`
+yang bukan dependency proyek ini. Arsitektur dan keputusan teknis ada di `docs/rules.md`.
+
+## Cara jalan
+
+Butuh Node.js >= 20.9.0 (`engines` di `node_modules/next/package.json`). Package manager
+repo ini **npm** — `package-lock.json` satu-satunya lockfile.
 
 ```bash
+npm install
+# buat .env.local berisi dua baris: lihat tabel Konfigurasi di bawah
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka http://localhost:3001.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Perintah lain yang benar-benar ada di `package.json`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build    # next build
+npm run start    # next start
+npm run lint     # eslint
+npx tsc --noEmit # cek tipe
+```
 
-## Learn More
+## Struktur
 
-To learn more about Next.js, take a look at the following resources:
+| Path | Isi |
+|---|---|
+| `app/` | Route App Router: `/`, `/about`, `/categories`, `/categories/[category]`, `/photo/[id]`, `/login`, `/bookmarks`, `/settings`, `/admin`, `/api/admin/post/[id]`, `/auth/callback`, `/auth/signout` |
+| `components/` | Komponen UI; primitif shadcn/ui di `components/ui/`, panel admin di `components/admin/` |
+| `lib/` | Lapisan data dan utilitas: `lib/posts-repository.ts`, `lib/bookmarks.ts`, `lib/auth/viewer.ts`, `lib/imgur-check.ts`, klien Supabase di `lib/supabase/` |
+| `supabase/` | Skrip SQL: `supabase/schema.sql`, `supabase/bookmarks.sql`, `supabase/seed.sql` |
+| `docs/` | `docs/rules.md` (arsitektur, model data, jebakan), `docs/progress.md` (status), `docs/README.md` (panduan setup) |
+| `proxy.ts` | Penyegar token Supabase per request — di Next 16 berkas ini bernama `proxy.ts`, bukan `middleware` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Konfigurasi
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Env var | Wajib | Fungsi |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | ya, untuk data nyata | URL project Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ya, untuk data nyata | Anon/publishable key Supabase |
 
-## Deploy on Vercel
+Dibaca di `lib/supabase/client.ts`, `lib/supabase/server.ts`, `lib/supabase/public.ts`, dan
+`proxy.ts`. Tanpa keduanya aplikasi tidak crash — klien Supabase jadi `null` dan `proxy.ts`
+dilewati — tapi galeri, login, dan bookmark tidak punya data. Tidak ada `service_role` key
+di proyek ini; semua operasi admin lewat RLS.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`.env.local` masuk `.gitignore` (`.env*`), jadi isi nilainya manual setelah clone — termasuk
+`.env.example` yang juga tidak ikut ter-commit.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Catatan
+
+- **Port dev 3001, bukan 3000.** Script `dev` adalah `next dev -p 3001`. Kalau port diubah,
+  tambahkan juga `http://localhost:3001/**` di Supabase Dashboard → Authentication → URL
+  Configuration, kalau tidak callback OAuth gagal.
+- **Database disiapkan manual** di Supabase SQL Editor, berurutan: `supabase/schema.sql`
+  (tabel `posts`, `profiles`, RLS), lalu `supabase/bookmarks.sql`, lalu `supabase/seed.sql`
+  (opsional, data contoh).
+- **Login hanya Google OAuth**, tidak ada password. Provider Google harus diaktifkan di
+  Supabase Dashboard dengan Client ID/Secret dari Google Cloud Console.
+- **Metadata untuk guest hanya disamarkan CSS** (blur), bukan dihapus dari DOM. Itu proteksi
+  tampilan, bukan proteksi data.
+- Gambar dilayani dari `i.imgur.com`, terdaftar di `images.remotePatterns` (`next.config.ts`),
+  dan `images.qualities` dibatasi `[75, 85]` — Next 16 menolak quality lain dengan HTTP 400.

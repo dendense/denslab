@@ -58,7 +58,7 @@ Auth) · Imgur · Vercel
 
    Di Supabase Dashboard → Authentication → URL Configuration, tambahkan:
    ```
-   http://localhost:3000/**
+   http://localhost:3001/**
    ```
 
    Aktifkan provider Google dan lengkapi Client ID serta Secret dari Google
@@ -69,7 +69,7 @@ Auth) · Imgur · Vercel
    npm run dev
    ```
 
-   Buka http://localhost:3000
+   Buka http://localhost:3001
 
 ## Perintah
 
