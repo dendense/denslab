@@ -197,11 +197,9 @@ export function SiteHeader() {
           Admin
         </NavItem>
       )}
-      {/*
-       * Portfolio is an outbound link (Deny will point it at another site
-       * later), so it is a plain <a> — not next/link's <Link>, which is for
-       * in-app navigation and would prefetch a route that does not exist.
-       * href="#" is a deliberate placeholder until Deny supplies the real URL.
+      {/* Portfolio is an outbound link (points at https://dendense.vercel.app/),
+       * so it is a plain <a> — not next/link's <Link>, which is for in-app
+       * navigation and would prefetch a route that does not exist.
        * rel="noopener noreferrer" pairs with target="_blank" so the opened
        * page cannot reach back through window.opener.
        *
@@ -211,7 +209,7 @@ export function SiteHeader() {
        */}
       <li>
         <a
-          href="#"
+          href="https://dendense.vercel.app/"
           target="_blank"
           rel="noopener noreferrer"
           className={cn(
