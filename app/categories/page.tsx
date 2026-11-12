@@ -47,7 +47,7 @@ export default async function CategoriesPage() {
             <li key={category}>
               <Link
                 href={`/categories/${CATEGORY_SLUGS[category]}`}
-                className="bg-card text-card-foreground flex h-full flex-col justify-between gap-6 rounded-xl border p-6 transition-colors"
+                className="bg-card text-card-foreground group flex h-full flex-col justify-between gap-6 rounded-xl border p-6 outline-none transition-[border-color,box-shadow,transform] duration-200 hover:border-primary hover:shadow-md focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.985] motion-reduce:transition-none motion-reduce:active:scale-100"
               >
                 <div className="space-y-2">
                   <Badge>Category</Badge>
@@ -64,7 +64,10 @@ export default async function CategoriesPage() {
 
                 <span className="inline-flex items-center gap-2 text-sm font-bold sm:text-base">
                   View posts
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  <ArrowRight
+                    className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transition-none"
+                    aria-hidden="true"
+                  />
                 </span>
               </Link>
             </li>

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { BackToTop } from "@/components/back-to-top";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteHeader />
         {children}
         <SiteFooter />
+        <BackToTop />
         <Script id="theme-color-sync">{`var m=document.querySelector('meta[name="theme-color"]');if(m){var u=function(){m.setAttribute('content',getComputedStyle(document.documentElement).getPropertyValue('--background').trim()||'#fff')};u();new MutationObserver(u).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']})}`}</Script>
       </body>
     </html>

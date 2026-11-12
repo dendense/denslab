@@ -213,6 +213,26 @@
     color: var(--foreground);
   }
 
+  /* Anchor jumps and scroll-to-top glide, except for readers who opt out. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /*
+   * Touch polish: drop the grey flash browsers paint on tap (the cards and
+   * buttons have their own pressed state) and the 300ms double-tap-zoom wait.
+   */
+  a,
+  button,
+  [role="button"],
+  input,
+  summary {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
   ::selection {
     background-color: var(--primary);
     color: var(--primary-foreground);

@@ -51,9 +51,12 @@ export function PostCard({
       whileInView="visible"
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="bg-card text-card-foreground group mb-4 block break-inside-avoid overflow-hidden rounded-xl border sm:mb-5 lg:mb-6"
+      className="bg-card text-card-foreground group mb-4 block break-inside-avoid overflow-hidden rounded-xl border transition-[border-color,box-shadow] duration-200 focus-within:border-primary hover:border-primary hover:shadow-md sm:mb-5 lg:mb-6 motion-reduce:transition-none"
     >
-      <Link href={`/photo/${post.id}`} className="block">
+      <Link
+        href={`/photo/${post.id}`}
+        className="block outline-none transition-transform duration-150 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset active:scale-[0.985] motion-reduce:transition-none motion-reduce:active:scale-100"
+      >
         <div className="relative">
           {/*
             The skeleton only makes sense while a real image is loading. When the
@@ -75,7 +78,7 @@ export function PostCard({
             priority={priority}
             imageAvailable={post.imageAvailable}
             onSettled={() => setLoaded(true)}
-            className="w-full object-cover"
+            className="w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
 
           {/*
@@ -126,7 +129,10 @@ export function PostCard({
           */}
           <Badge className="shrink-0 lg:px-2" aria-label="Details">
             <span className="lg:sr-only">Details</span>
-            <ArrowRight className="h-3 w-3" aria-hidden="true" />
+            <ArrowRight
+              className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none"
+              aria-hidden="true"
+            />
           </Badge>
         </div>
       </Link>

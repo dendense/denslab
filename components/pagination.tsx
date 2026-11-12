@@ -64,19 +64,20 @@ export function Pagination({
 
   return (
     <PaginationRoot className="mt-8 sm:mt-10">
-      <PaginationContent>
+      <PaginationContent className="flex-wrap justify-center">
         <PaginationItem>
           {page > 1 ? (
             <PaginationLink
               href={hrefFor(basePath, query, page - 1)}
               rel="prev"
               aria-label="Previous page"
+              className="h-10 w-10 sm:h-9 sm:w-9"
             >
               <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </PaginationLink>
           ) : (
             <span
-              className="flex h-9 w-9 items-center justify-center"
+              className="flex h-10 w-10 items-center justify-center sm:h-9 sm:w-9"
               aria-hidden="true"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -89,7 +90,7 @@ export function Pagination({
             <PaginationItem key={`gap-${index}`}>
               <span
                 aria-hidden="true"
-                className="flex h-9 w-9 items-center justify-center"
+                className="flex h-10 w-10 items-center justify-center sm:h-9 sm:w-9"
               >
                 …
               </span>
@@ -98,6 +99,7 @@ export function Pagination({
             <PaginationItem key={item}>
               <PaginationLink
                 isActive={item === page}
+                className="h-10 w-10 sm:h-9 sm:w-9"
                 href={hrefFor(basePath, query, item)}
                 aria-label={
                   item === page ? `Page ${item}, current page` : `Page ${item}`
@@ -115,12 +117,13 @@ export function Pagination({
               href={hrefFor(basePath, query, page + 1)}
               rel="next"
               aria-label="Next page"
+              className="h-10 w-10 sm:h-9 sm:w-9"
             >
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </PaginationLink>
           ) : (
             <span
-              className="flex h-9 w-9 items-center justify-center"
+              className="flex h-10 w-10 items-center justify-center sm:h-9 sm:w-9"
               aria-hidden="true"
             >
               <ChevronRight className="h-4 w-4" />
