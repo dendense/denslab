@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GalleryGrid } from "@/components/gallery-grid";
@@ -14,13 +15,28 @@ function first(value: string | string[] | undefined) {
 export default async function Home({ searchParams }: PageProps<"/">) {
   const params = await searchParams;
 
-  const page = Number.parseInt(first(params.page) ?? "1", 10) || 1;
+  const requested = Number.parseInt(first(params.page) ?? "1", 10);
+  const page = Number.isInteger(requested) && requested > 0 ? requested : 1;
   const search = (first(params.q) ?? "").trim();
-
-  const { posts, total, pageCount } = await fetchPostPage(page, undefined, search);
 
   // Kept on pagination links so moving between pages does not drop the term.
   const preserved = search ? new URLSearchParams({ q: search }).toString() : "";
+
+  const { posts, total, pageCount } = await fetchPostPage(page, undefined, search);
+
+  // Past the last page: send the reader to the last one instead of an empty grid.
+  if (page > pageCount) {
+    redirect(
+      pageCount > 1
+        ? `/?${new URLSearchParams({
+            ...(search ? { q: search } : {}),
+            page: String(pageCount),
+          })}`
+        : preserved
+          ? `/?${preserved}`
+          : "/",
+    );
+  }
 
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-14 lg:px-10">

@@ -190,7 +190,8 @@ function matchesSearch(post: PostCardData, term: string): boolean {
     post.title.toLowerCase().includes(needle) ||
     post.description.toLowerCase().includes(needle) ||
     post.category.toLowerCase().includes(needle) ||
-    post.tags.some((tag) => tag.toLowerCase().includes(needle))
+    // Exact, like the database's `tags.cs` filter, so demo and live agree.
+    post.tags.some((tag) => tag.toLowerCase() === needle)
   );
 }
 
@@ -227,24 +228,28 @@ async function readPostPage(
 
   const { data, error, count } = await query;
 
+  // Thrown, not turned into demo data here: this runs inside `unstable_cache`,
+  // and a returned fallback would be cached as if it were a real result.
+  // `fetchPostPage` catches it outside the cache.
   if (error || !data) {
-    // Logged rather than swallowed: silently falling back to demo data once hid
-    // a broken search filter, making a real query bug look like "no results".
-    console.error("[posts] list query failed:", error?.message ?? "no data");
-    let all = demoCards();
-    if (category) all = all.filter((post) => post.category === category);
-    if (term) all = all.filter((post) => matchesSearch(post, term));
-    return paginate(all, page);
+    throw new Error(error?.message ?? "no data");
   }
 
   const total = count ?? data.length;
 
-  // An empty table usually means the seed has not run yet during setup. A
-  // filtered search legitimately returns zero rows, so that case is excluded.
+  // Demo data only when the whole table is empty (seed has not run yet). A
+  // category or search with zero rows is legitimately empty, and showing demo
+  // cards there would link to ids that do not exist.
   if (total === 0 && !term) {
-    let all = demoCards();
-    if (category) all = all.filter((post) => post.category === category);
-    return paginate(all, page);
+    const { count: allCount } = await supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true });
+
+    if ((allCount ?? 0) === 0) {
+      let all = demoCards();
+      if (category) all = all.filter((post) => post.category === category);
+      return paginate(all, page);
+    }
   }
 
   return {
@@ -282,12 +287,24 @@ export async function fetchPostPage(
   const term = (search ?? "").trim().toLowerCase().slice(0, 80);
   const key = category ?? "all";
 
-  return unstable_cache(
-    (p: number, c: PostCategory | "all", t: string) =>
-      readPostPage(p, c === "all" ? undefined : c, t),
-    ["posts-page"],
-    { tags: [POSTS_CACHE_TAG] },
-  )(safePage, key, term);
+  try {
+    return await unstable_cache(
+      (p: number, c: PostCategory | "all", t: string) =>
+        readPostPage(p, c === "all" ? undefined : c, t),
+      ["posts-page"],
+      // Time-based expiry as well as the tag, so Imgur availability verdicts
+      // baked into the cards are re-checked instead of living until an edit.
+      { tags: [POSTS_CACHE_TAG], revalidate: 3600 },
+    )(safePage, key, term);
+  } catch (error) {
+    // Logged rather than swallowed: silently falling back to demo data once hid
+    // a broken search filter, making a real query bug look like "no results".
+    console.error("[posts] list query failed:", error);
+    let all = demoCards();
+    if (category) all = all.filter((post) => post.category === category);
+    if (term) all = all.filter((post) => matchesSearch(post, term));
+    return paginate(all, safePage);
+  }
 }
 
 /**

@@ -21,8 +21,6 @@
 /** `Asia/Jakarta` (WIB) is UTC+7 year-round, no DST. */
 const WIB_OFFSET_MINUTES = 7 * 60;
 
-const MINUTES_PER_DAY = 24 * 60;
-
 function pad2(value: number): string {
   return String(value).padStart(2, "0");
 }
@@ -78,10 +76,6 @@ export function wibIsoDate(value: string | null | undefined): string | null {
 
   const shiftedMs = time + WIB_OFFSET_MINUTES * 60 * 1000;
   const shifted = new Date(shiftedMs);
-
-  // Guarded by construction, but the shift crossing a day boundary is the
-  // whole point of this module, so the arithmetic is stated once and asserted.
-  const daysSinceEpoch = Math.floor(shiftedMs / (MINUTES_PER_DAY * 60 * 1000));
 
   return `${shifted.getUTCFullYear()}-${pad2(
     shifted.getUTCMonth() + 1,

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { GalleryGrid } from "@/components/gallery-grid";
 import { Pagination } from "@/components/pagination";
@@ -32,8 +32,11 @@ export default async function CategoryPage({
   if (!category) notFound();
 
   const query = await searchParams;
-  const page = Number.parseInt(first(query.page) ?? "1", 10) || 1;
+  const requested = Number.parseInt(first(query.page) ?? "1", 10);
+  const page = Number.isInteger(requested) && requested > 0 ? requested : 1;
   const search = (first(query.q) ?? "").trim();
+
+  const preserved = search ? new URLSearchParams({ q: search }).toString() : "";
 
   const { posts, total, pageCount } = await fetchPostPage(
     page,
@@ -41,7 +44,13 @@ export default async function CategoryPage({
     search,
   );
 
-  const preserved = search ? new URLSearchParams({ q: search }).toString() : "";
+  // Past the last page: send the reader to the last one instead of an empty grid.
+  if (page > pageCount) {
+    const params = new URLSearchParams(preserved);
+    if (pageCount > 1) params.set("page", String(pageCount));
+    const qs = params.toString();
+    redirect(qs ? `/categories/${slug}?${qs}` : `/categories/${slug}`);
+  }
 
   return (
     <main className="w-full flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-10">

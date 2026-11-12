@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { imgurFullUrl } from "@/lib/posts";
 import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {

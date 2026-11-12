@@ -37,8 +37,16 @@ export async function isImgurImageAvailable(imgurId: string): Promise<boolean> {
       next: { revalidate: 3600, tags: ["imgur-check"] },
     });
 
-    // A live image ends at `<id>h.jpg`; a dead one ends at `removed.png`.
+    // A live image ends at `<id>h.jpg`; a dead one ends at `removed.png` or 404s.
     const landedOnRemoved = response.url.includes("removed");
+
+    // Rate limiting (429) or an Imgur outage (5xx) says nothing about this
+    // image. Assume it is fine and do not memoise, so one bad moment cannot
+    // turn a whole gallery into placeholders for an hour.
+    if (!response.ok && response.status !== 404 && !landedOnRemoved) {
+      return true;
+    }
+
     const ok = response.ok && !landedOnRemoved;
 
     cache.set(imgurId, ok);

@@ -13,6 +13,7 @@ import {
   fetchPostById,
   isPostImageAvailable,
 } from "@/lib/posts-repository";
+import { redactPost } from "@/lib/redact-post";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -164,7 +165,10 @@ export default async function PhotoDetailPage({
             </dl>
           </div>
 
-          <PromptPanel post={post} isAuthenticated={authenticated} />
+          <PromptPanel
+            post={authenticated ? post : redactPost(post)}
+            isAuthenticated={authenticated}
+          />
         </div>
       </div>
     </main>

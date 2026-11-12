@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,13 +14,15 @@ import { createClient } from "@/lib/supabase/client";
  * email and avatar, so the name is the only profile field we manage here.
  */
 export function UsernameForm({ initialName }: { initialName: string }) {
+  const router = useRouter();
   const [value, setValue] = useState(initialName);
+  const [savedName, setSavedName] = useState(initialName);
   const [pending, setPending] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const trimmed = value.trim();
-  const unchanged = trimmed === initialName;
+  const unchanged = trimmed === savedName;
   const tooShort = trimmed.length < 2;
   const tooLong = trimmed.length > 32;
   const disabled = pending || unchanged || tooShort || tooLong;
@@ -48,8 +51,11 @@ export function UsernameForm({ initialName }: { initialName: string }) {
       return;
     }
 
+    setSavedName(trimmed);
     setSaved(true);
     setPending(false);
+    // Re-render server components so the navbar shows the new name.
+    router.refresh();
   }
 
   return (
@@ -66,7 +72,7 @@ export function UsernameForm({ initialName }: { initialName: string }) {
           setSaved(false);
         }}
         autoComplete="nickname"
-        maxLength={40}
+        maxLength={32}
       />
 
       <p className="text-muted-foreground text-sm">

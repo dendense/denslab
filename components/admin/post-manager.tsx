@@ -106,8 +106,14 @@ export function PostManager({ posts }: { posts: Row[] }) {
                   // The list row is trimmed for display; the form needs the full
                   // post, so it is refetched on the client before editing.
                   fetch(`/api/admin/post/${row.id}`)
-                    .then((res) => res.json())
-                    .then((full: Post) => setMode({ kind: "edit", post: full }))
+                    .then((res) => {
+                      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                      return res.json();
+                    })
+                    .then((full: Post) => {
+                      setError(null);
+                      setMode({ kind: "edit", post: full });
+                    })
                     .catch(() => setError("Could not load this post."));
                 }}
               >
