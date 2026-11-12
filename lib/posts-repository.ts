@@ -291,7 +291,8 @@ export async function fetchPostPage(
     return await unstable_cache(
       (p: number, c: PostCategory | "all", t: string) =>
         readPostPage(p, c === "all" ? undefined : c, t),
-      ["posts-page"],
+      // "v2": drops entries cached before errors stopped being cached.
+      ["posts-page", "v2"],
       // Time-based expiry as well as the tag, so Imgur availability verdicts
       // baked into the cards are re-checked instead of living until an edit.
       { tags: [POSTS_CACHE_TAG], revalidate: 3600 },
@@ -397,11 +398,25 @@ async function readPostById(id: string): Promise<Post | undefined> {
  * to whichever one was cached first.
  */
 export async function fetchPostById(id: string): Promise<Post | undefined> {
-  return unstable_cache(
-    (postId: string) => readPostById(postId),
-    ["post"],
-    { tags: [POSTS_CACHE_TAG] },
-  )(id);
+  try {
+    return await unstable_cache(
+      async (postId: string) => {
+        const post = await readPostById(postId);
+        // A miss is thrown, not returned: `unstable_cache` stores whatever the
+        // function returns, so a single failed read (network blip, deploy with
+        // a bad env) would be cached as "post not found" and the detail page
+        // would 404 for a post that exists until the next admin edit. A thrown
+        // error is never cached.
+        if (!post) throw new Error("post not found");
+        return post;
+      },
+      // "v2": a new key so any miss already cached under the old key is dropped.
+      ["post", "v2"],
+      { tags: [POSTS_CACHE_TAG], revalidate: 3600 },
+    )(id);
+  } catch {
+    return undefined;
+  }
 }
 
 /**
